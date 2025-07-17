@@ -1,0 +1,97 @@
+Payroll System - System Specifications
+====================================
+
+1. Project Structure (Vanilla PHP, Not Framework MVC)
+-----------------------------------------------------
+
+Root Folders:
+- admin/ — Main application logic, all business features, and user interface for admins/staff.
+- login/ — Handles authentication (login forms, session start, etc.).
+- db/ — Contains the SQL file for the database schema and sample data.
+- plugins/ and bower_components/ — All external JS/CSS libraries and plugins.
+- TCPDF/ — Third-party PHP library for PDF generation.
+- images/ — Static image assets.
+
+Inside admin/:
+- Feature files: Each PHP file (e.g., employee.php, payroll.php, position.php) is a self-contained page, often acting as both controller and view.
+- includes/: Shared PHP files for session management, database connection, modals (HTML+PHP), headers, footers, navigation, and scripts.
+- backups/, reimbursement/: Feature-specific folders for backup logic and reimbursement images/files.
+
+2. How the Project Runs
+-----------------------
+- Entry Point: Users access the system via a URL pointing to a PHP file (e.g., admin/home.php or login/index.php).
+- Session Management: Every admin page includes includes/session.php at the top, which:
+  - Starts the session.
+  - Checks if the user is logged in ($_SESSION['user']).
+  - Loads user info from the database.
+  - Handles session expiration.
+- Database Connection: Every page that needs the database includes includes/conn.php (or login/conn.php), which creates a $conn object using mysqli.
+- Page Structure: Each page includes:
+  - header.php (HTML <head>, CSS includes)
+  - navbar.php and menubar.php (navigation)
+  - The main content (table, forms, etc.)
+  - footer.php and scripts.php (JS includes)
+- AJAX/Modals: Many pages use modals (from includes/) and AJAX handlers (e.g., account_employee_row.php) for dynamic actions like editing or fetching data.
+
+3. Where Are the Functions/Logic?
+---------------------------------
+- No OOP or Framework MVC: This is a classic "include-based" PHP project, not a modern MVC framework.
+- Business Logic: Scattered in each feature file (e.g., employee_add.php, payroll_add.php, account_employee_row.php). These files:
+  - Receive POST/GET requests.
+  - Run SQL queries directly.
+  - Output HTML or JSON.
+- Shared Logic: In includes/:
+  - session.php — Session and user info.
+  - conn.php — Database connection.
+  - header.php, footer.php, navbar.php, menubar.php — Shared UI.
+  - *_modal.php — HTML+PHP for modals (forms, popups).
+- JavaScript: In includes/scripts.php and some feature files, for DataTables, date pickers, etc.
+
+4. Database
+-----------
+- Schema File: db/payroll.sql
+- Connection: Both admin/includes/conn.php and login/conn.php use:
+  $conn = new mysqli('localhost', 'root', '', 'payroll');
+- Tables: (from the SQL file)
+  - admin, user, employees, attendance, payroll_employee, payroll_summary, salary_calculation, deductions, position, reg_rel, base_pay, cashadvance, income_tax, location, system_lock, _session, etc.
+- Usage: SQL queries are written directly in each PHP file, not abstracted into models.
+
+5. External Modules and Libraries
+---------------------------------
+PHP Libraries:
+- TCPDF (TCPDF/): For generating PDF reports and payslips.
+
+JavaScript/CSS (via bower_components/ and plugins/):
+- jQuery, jQuery UI
+- Bootstrap (CSS/JS)
+- Font Awesome, Ionicons (icons)
+- DataTables (table sorting/filtering)
+- Moment.js (date handling)
+- Bootstrap Datepicker, Daterangepicker, Timepicker, Colorpicker
+- Chart.js, Morris.js, Plotly (charts/graphs)
+- jvectormap (maps)
+- jsGrid, jszip, select2, fastclick, slimscroll, sparkline, knob, fullcalendar, iCheck, wysihtml5, etc.
+- PACE (progress bar)
+- ckeditor (rich text editor)
+
+All these are included via <script> and <link> tags in includes/header.php and includes/scripts.php.
+
+6. Summary of MVC/Structure
+---------------------------
+- Not strict MVC: No separation into Model, View, Controller folders. Each PHP file is a mix of controller and view, with SQL queries and HTML together.
+- "Model": Direct SQL queries in each PHP file.
+- "View": HTML in each PHP file, with shared parts in includes/.
+- "Controller": The main PHP file for each feature (e.g., employee.php, payroll.php).
+- Shared logic: In includes/ (session, connection, modals, navigation, scripts).
+
+7. Suggestions / Next Steps
+---------------------------
+- If you want to refactor to MVC: Consider using a framework (Laravel, CodeIgniter, Symfony) or at least separate SQL logic into "model" files, keep controllers thin, and use templates for views.
+- Security: Use prepared statements to prevent SQL injection (currently, SQL is built with string concatenation).
+- Reusability: Move repeated SQL and logic into functions or classes.
+- Documentation: Add comments and documentation for each feature file.
+- Testing: Add test data and test scripts for easier maintenance.
+
+---
+
+If you want to know about a specific feature, function, or want a diagram of the flow, or want to refactor a part to MVC, let me know! 
