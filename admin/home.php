@@ -72,6 +72,27 @@
                                 <a href="home.php" class="small-box-footer"><i class="fa fa-arrow-circle-right"></i></a>
                             </div>
                         </div>
+                        <!-- Cumulative Net Payroll Card -->
+                        <div class="col-lg-3 col-md-6">
+                            <div class="small-box bg-purple">
+                                <div class="inner">
+                                    <?php
+                                    $year = date('Y');
+                                    $month = date('m');
+                                    $sql = "SELECT SUM(CAST(net_salary AS DECIMAL(15,2))) AS totalNet FROM payroll_employee WHERE YEAR(created_on) = '$year' AND MONTH(created_on) = '$month'";
+                                    $query = $conn->query($sql);
+                                    $row = $query->fetch_assoc();
+                                    $totalNet = $row['totalNet'] ? $row['totalNet'] : 0;
+                                    echo "<h3>&#8369; " . number_format($totalNet, 2) . "</h3>";
+                                    ?>
+                                    <p>Cumulative Net Payroll (This Month)</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fa fa-money"></i>
+                                </div>
+                                <a href="payroll.php" class="small-box-footer"><i class="fa fa-arrow-circle-right"></i></a>
+                            </div>
+                        </div>
                         <div class="col-lg-3 col-md-6">
                             <!-- small box -->
                             <div class="small-box bg-blue">

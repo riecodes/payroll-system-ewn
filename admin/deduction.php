@@ -1,5 +1,6 @@
 <?php include 'includes/session.php'; ?>
 <?php include 'includes/header.php'; ?>
+<link rel="stylesheet" href="deduction.css">
 <body class="hold-transition skin-blue sidebar-mini">
 <div class="wrapper">
 
@@ -14,7 +15,7 @@
         Deductions
       </h1>
       <ol class="breadcrumb">
-      <li><button style="color:yellow;font-size:15px;margin-top:2px;background:green" class="lock"><i class="fa fa-lock"></i>&nbsp;&nbsp;&nbsp;<span style="color:white;font-weight:bolder">LOCK SYSTEM</span></button></li>
+      <li><button class="lock lock-system-btn"><i class="fa fa-lock"></i>&nbsp;&nbsp;&nbsp;<span class="lock-system-text">LOCK SYSTEM</span></button></li>
         <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
         <li class="active">Deductions</li>
       </ol>
@@ -43,13 +44,15 @@
           unset($_SESSION['success']);
         }
       ?>
+      
+      <!-- Deduction Settings Section -->
       <div class="row">
         <div class="col-xs-8">
           <div class="box">
-            <!-- <div class="box-header with-border">
-              <a href="#addnew" data-toggle="modal" class="btn btn-primary btn-sm btn-flat"><i class="fa fa-plus"></i> New</a>
-            </div> -->
-            <div class="box-body" style="overflow-x:auto;">
+            <div class="box-header with-border">
+              <h3 class="box-title">Deduction Settings</h3>
+            </div>
+            <div class="box-body">
               <table id="" class="table table-bordered">
                 <thead>
                   <th>ID</th>
@@ -75,31 +78,106 @@
                         </tr>
                       ";
                     }
-                    // <button class='btn btn-danger btn-sm delete btn-flat' data-id='".$row['id']."'><i class='fa fa-trash'></i> Delete</button>
                   ?>
                 </tbody>
               </table>
             </div>
           </div>
         </div>
-          <div class="col-xs-4">
-            <div class="box">
-                <div class="box-body">
-                    <div class="form-group">
-                        <?php
-                            $sql_wage = "SELECT * FROM wage";
-                            $query_wage = $conn->query($sql_wage);
-                            $row_w = $query_wage->fetch_assoc();
-                        ?>
-                        <label for="current-wage">Minimum wage</label>
-                        <input type="hidden" name="id" id="wage-id" value="<?php echo $row_w['id']; ?>">
-                        <input type="text" class="form-control wage" id="current-wage" name="wage" value="<?php echo $row_w['current_wage']; ?>">
-                    </div>
-                    <button type="submit" class="btn btn-success" id="apply-wage">Apply</button>
-                </div>
+        <div class="col-xs-4">
+          <div class="box">
+            <div class="box-body">
+              <div class="form-group">
+                <?php
+                  $sql_wage = "SELECT * FROM wage";
+                  $query_wage = $conn->query($sql_wage);
+                  $row_w = $query_wage->fetch_assoc();
+                ?>
+                <label for="current-wage">Minimum wage</label>
+                <input type="hidden" name="id" id="wage-id" value="<?php echo $row_w['id']; ?>">
+                <input type="text" class="form-control wage" id="current-wage" name="wage" value="<?php echo $row_w['current_wage']; ?>">
+              </div>
+              <button type="submit" class="btn btn-success" id="apply-wage">Apply</button>
             </div>
+          </div>
         </div>
       </div>
+
+      <!-- SSS Contribution Table -->
+      <div class="row">
+        <div class="col-xs-12">
+          <div class="box">
+            <div class="box-header with-border">
+              <h3 class="box-title">SSS Contribution Schedule</h3>
+              <div class="box-tools pull-right">
+                <button class="btn btn-primary btn-sm" id="edit-sss-schedule">
+                  <i class="fa fa-edit"></i> Edit Schedule
+                </button>
+              </div>
+            </div>
+            <div class="box-body">
+              <div class="table-container">
+                <table class="deduction-table table table-bordered table-striped">
+                  <thead>
+                    <tr class="bg-primary">
+                      <th rowspan="2" class="text-center">RANGE OF<br>COMPENSATION</th>
+                      <th colspan="4" class="text-center">EMPLOYER CONTRIBUTION</th>
+                      <th colspan="3" class="text-center">EMPLOYEE CONTRIBUTION</th>
+                      <th rowspan="2" class="text-center">TOTAL</th>
+                    </tr>
+                    <tr class="bg-info">
+                      <th class="sub-header text-center">REGULAR SS</th>
+                      <th class="sub-header text-center">MPF</th>
+                      <th class="sub-header text-center">EC</th>
+                      <th class="sub-header text-center">TOTAL</th>
+                      <th class="sub-header text-center">REGULAR SS</th>
+                      <th class="sub-header text-center">MPF</th>
+                      <th class="sub-header text-center">TOTAL</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <?php
+                      // Fetch SSS contribution data from database
+                      $sql_sss = "SELECT * FROM sss_contribution_schedule ORDER BY min_compensation ASC";
+                      $query_sss = $conn->query($sql_sss);
+                      
+                      if($query_sss->num_rows > 0) {
+                        while($row_sss = $query_sss->fetch_assoc()) {
+                          $range_text = $row_sss['min_compensation'] == 0 ? 'BELOW ' . number_format($row_sss['max_compensation']) : 
+                                       number_format($row_sss['min_compensation']) . ' - ' . number_format($row_sss['max_compensation']);
+                          
+                          $employer_total = $row_sss['regular_ss_employer'] + $row_sss['mpf_employer'] + $row_sss['ec_employer'];
+                          $employee_total = $row_sss['regular_ss_employee'] + $row_sss['mpf_employee'];
+                          $grand_total = $employer_total + $employee_total;
+                          
+                          echo "<tr class='sss-row' data-id='" . $row_sss['id'] . "'>";
+                          echo "<td class='range-cell text-center'><strong>" . $range_text . "</strong></td>";
+                          echo "<td class='text-center'>" . number_format($row_sss['regular_ss_employer'], 2) . "</td>";
+                          echo "<td class='text-center'>" . ($row_sss['mpf_employer'] > 0 ? number_format($row_sss['mpf_employee'], 2) : '-') . "</td>";
+                          echo "<td class='text-center'>" . number_format($row_sss['ec_employer'], 2) . "</td>";
+                          echo "<td class='text-center'><strong>" . number_format($employer_total, 2) . "</strong></td>";
+                          echo "<td class='text-center'>" . number_format($row_sss['regular_ss_employee'], 2) . "</td>";
+                          echo "<td class='text-center'>" . ($row_sss['mpf_employee'] > 0 ? number_format($row_sss['mpf_employee'], 2) : '-') . "</td>";
+                          echo "<td class='text-center'><strong>" . number_format($employee_total, 2) . "</strong></td>";
+                          echo "<td class='total-cell text-center'><strong>" . number_format($grand_total, 2) . "</strong></td>";
+                          echo "</tr>";
+                        }
+                      } else {
+                        // Fallback to hardcoded data if database is empty
+                        echo "<tr><td colspan='9' class='text-center text-muted'>No SSS contribution data found. Please add data to the database.</td></tr>";
+                      }
+                    ?>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+
+      <!-- Income Tax Section -->
       <div class="row">
         <div class="col-xs-8">
           <h3>Income tax</h3>
@@ -200,6 +278,7 @@
   <?php include 'includes/deduction_modal.php'; ?>
   <?php include 'includes/security_modal.php'; ?>
   <?php include 'includes/income_tax_modal.php'; ?>
+  <?php include 'includes/sss_contribution_modal.php'; ?>
 
 </div>
 <?php include 'includes/scripts.php'; ?>
@@ -224,6 +303,66 @@
       $('#security_edit').modal('show');
       var id = $(this).data('id');
       getRow(id); // Ensure this function is defined and works correctly
+    });
+
+    // Handle SSS edit button click
+    $('#edit-sss-schedule').click(function(e){
+      e.preventDefault();
+      $('#security_edit_sss').modal('show');
+    });
+
+    // Handle SSS security form submission
+    $('#security-form-edit-sss').submit(function(e){
+      e.preventDefault();
+      const password = $('#security-pass-edit-sss').val();
+      $.ajax({
+        url: 'vax_location_security.php',
+        method: 'POST',
+        data: { password: password },
+        success: function(response) {
+          response = JSON.parse(response);
+          if(response.result === true) {
+            $('#security_edit_sss').modal('hide');
+            // Show a message that they can now click on any row to edit
+            alert('Security verified! Click on any row in the SSS table to edit it.');
+          } else {
+            alert('Incorrect password. Please try again.');
+          }
+        },
+        error: function() {
+          alert('An error occurred while validating the password. Please try again.');
+        }
+      });
+    });
+
+    // Handle SSS contribution form submission
+    $('#edit-sss-form').submit(function(e){
+      e.preventDefault();
+      const formData = $(this).serialize();
+      $.ajax({
+        url: 'sss_contribution_update.php',
+        method: 'POST',
+        data: formData,
+        success: function(response) {
+          response = JSON.parse(response);
+          if(response.success) {
+            alert(response.message);
+            $('#editSSS').modal('hide');
+            location.reload(); // Refresh to show updated data
+          } else {
+            alert('Error: ' + response.message);
+          }
+        },
+        error: function() {
+          alert('An error occurred while updating the SSS contribution. Please try again.');
+        }
+      });
+    });
+
+    // Handle SSS table row clicks for editing
+    $(document).on('click', '.sss-row', function(){
+      const id = $(this).data('id');
+      getSSSRow(id);
     });
 
     $('#security-form-edit').submit(function(e) {
@@ -438,9 +577,39 @@
         console.log(response);
         $('#tax-id').val(response.id);
         $('.delete_id').val(response.id);
-        $('#edit-first-bracket').val(response.first_bracket);
-        $('#edit-second-bracket').val(response.second_bracket);
+        $('#edit-first-bracket').val(response.second_bracket);
         $('#edit-tax-rate').val(response.tax_rate);
+      }
+    });
+  }
+
+  // Function to get SSS row details
+  function getSSSRow(id){
+    $.ajax({
+      type: 'POST',
+      url: 'sss_contribution_row.php',
+      data: {id:id},
+      dataType: 'json',
+      success: function(response){
+        if(response.error) {
+          alert('Error: ' + response.error);
+          return;
+        }
+        
+        $('#sss-id').val(response.id);
+        $('#edit-min-compensation').val(response.min_compensation);
+        $('#edit-max-compensation').val(response.max_compensation);
+        $('#edit-regular-ss-employer').val(response.regular_ss_employer);
+        $('#edit-mpf-employer').val(response.mpf_employer);
+        $('#edit-ec-employer').val(response.ec_employer);
+        $('#edit-regular-ss-employee').val(response.regular_ss_employee);
+        $('#edit-mpf-employee').val(response.mpf_employee);
+        $('#edit-sss-active').val(response.active);
+        
+        $('#editSSS').modal('show');
+      },
+      error: function(){
+        alert('An error occurred while fetching SSS contribution data.');
       }
     });
   }

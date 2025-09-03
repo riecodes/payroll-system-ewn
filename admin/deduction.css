@@ -1,0 +1,182 @@
+/* Deduction Table Styling */
+.deduction-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 12px;
+}
+
+.deduction-table th,
+.deduction-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.deduction-table th {
+    background: linear-gradient(135deg, #3c8dbc 0%, #367fa9 100%);
+    color: white;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+}
+
+.deduction-table th.sub-header {
+    background: linear-gradient(135deg, #00c0ef 0%, #00acd6 100%);
+    color: white;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+}
+
+.deduction-table tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.deduction-table tbody tr:nth-child(odd) {
+    background-color: #ffffff;
+}
+
+.deduction-table tbody tr:hover {
+    background-color: #e8f4fd;
+    transition: background-color 0.3s ease;
+}
+
+.range-cell {
+    background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+    color: white;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+}
+
+.total-cell {
+    background: linear-gradient(135deg, #00a65a 0%, #008d4c 100%);
+    color: white;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+}
+
+/* Table container for horizontal scrolling */
+.table-container {
+    overflow-x: auto;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .deduction-table {
+        font-size: 10px;
+    }
+    
+    .deduction-table th,
+    .deduction-table td {
+        padding: 4px;
+    }
+}
+
+/* Box styling to match AdminLTE theme */
+.box {
+    border-radius: 3px;
+    border-top: 3px solid #3c8dbc;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+}
+
+.box-header {
+    background-color: #f9f9f9;
+    border-bottom: 1px solid #f4f4f4;
+    padding: 15px;
+}
+
+.box-title {
+    color: #444;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+/* Button styling */
+.btn-primary {
+    background-color: #3c8dbc;
+    border-color: #367fa9;
+}
+
+.btn-primary:hover {
+    background-color: #367fa9;
+    border-color: #204d74;
+}
+
+.btn-success {
+    background-color: #00a65a;
+    border-color: #008d4c;
+}
+
+.btn-success:hover {
+    background-color: #008d4c;
+    border-color: #005a2e;
+}
+
+.btn-info {
+    background-color: #00c0ef;
+    border-color: #00acd6;
+}
+
+.btn-info:hover {
+    background-color: #00acd6;
+    border-color: #008aad;
+}
+
+/* Form styling */
+.form-control:focus {
+    border-color: #3c8dbc;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(60, 141, 188, 0.6);
+}
+
+/* Alert styling */
+.alert-success {
+    background-color: #dff0d8;
+    border-color: #d6e9c6;
+    color: #3c763d;
+}
+
+.alert-danger {
+    background-color: #f2dede;
+    border-color: #ebccd1;
+    color: #a94442;
+}
+
+/* Modal styling */
+.modal-header {
+    background: linear-gradient(135deg, #3c8dbc 0%, #367fa9 100%);
+    color: white;
+    border-bottom: 1px solid #367fa9;
+}
+
+.modal-title {
+    color: white;
+    font-weight: bold;
+}
+
+/* Table responsive classes */
+.table-responsive {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+/* Custom scrollbar for table container */
+.table-container::-webkit-scrollbar {
+    height: 8px;
+}
+
+.table-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+    background: #3c8dbc;
+    border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+    background: #367fa9;
+} 
