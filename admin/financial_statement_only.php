@@ -169,18 +169,29 @@ function getRow(id){
         // AJAX call to fetch data from the server
         $.ajax({
             type: 'POST',
-            url: 'financial_management_fetch_data.php', // Replace 'fetch_attendance_data.php' with your actual server endpoint
+            url: 'financial_management_fetch_data.php',
             data: {
                 dateFrom: dateFrom,
                 dateTo: dateTo
             },
             dataType: 'json',
             success: function(response) {
-                // Generate printable output using fetched data
-                var printableContent = "<h1>Employees' financial Report during deployment</h1>";
+                // Generate printable output using fetched data with EWN logo and styling
+                var printableContent = `
+                <div class="" style="display:flex;align-items:center;justify-content:center;flex-direction:row;text-align:center">
+                <div style="margin-right: 20px;">
+                    <img src="${window.location.origin}/payroll-system-ewn/images/logo.png" class="img-responsive" id="ewn-logo" alt="img"  style="width: 100px">
+                </div>
+                <center><h1><b>EWN Manpower Services</b></h1></center>
+                
+                <b style="margin-left: 20px;">ewn@gmail.com <i class="fa fa-envelope-o"></i><b><br>
+                <b style="margin-left: 20px;">Noveleta, Cavite <i class="fa fa-location-arrow"></i><b>
+                </div>
+                `;
+                printableContent += "<h2>Employees' Financial Report During Deployment</h2>";
                 printableContent += "<p>Date Range: " + dateFrom + " to " + dateTo + "</p>";
                 printableContent += "<table border=''>";
-                printableContent += "<tr><th>Employee ID</th><th>Date</th><th>Salary</th><th>Incentives</th><th>Meal allowance</th><th>Adjustments</th><th>Transportation</th></tr>";
+                printableContent += "<tr><th>Employee ID</th><th>Date</th><th>Salary</th><th>Incentives</th><th>Meal Allowance</th><th>Adjustments</th><th>Transportation</th></tr>";
                 for (var i = 0; i < response.length; i++) {
                     printableContent += "<tr>";
                     printableContent += "<td>" + response[i].employee_id + "</td>";
@@ -193,22 +204,79 @@ function getRow(id){
                     printableContent += "</tr>";
                 }
                 printableContent += "</table>";
+                printableContent += `
+                <br><br><br>
+                
+                <div style="display:flex;align-items:right;justify-content:right;flex-direction:row;text-align:right">
+                    <div style="text-align:center">
+                      <span>Prepared by:</span><br>
+                      <span style="font-size:20px !important"><?php echo isset($_SESSION['name']) ? $_SESSION['name'] : ''; ?></span><br>
+                      <i><?php echo isset($_SESSION['role']) ? $_SESSION['role'] : ''; ?></i><br>
+                    </div>
+                </div>`;
 
                 // Open a new window for printing
                 var printWindow = window.open('', '_blank');
                 printWindow.document.open();
-                printWindow.document.write('<html><head><title>Print</title></head><body>');
-                printWindow.document.write(printableContent);
-                printWindow.document.write('</body></html>');
+                printWindow.document.write(`
+                                              <html>
+                                              <head>
+                                                  <title>Print</title>
+                                                  <style>
+                                                      body {
+                                                          font-family: Arial, sans-serif;
+                                                      }
+                                                      h1 {
+                                                          text-align: center;
+                                                      }
+                                                      h2 {
+                                                          text-align: center;
+                                                      }
+                                                      table {
+                                                          width: 100%;
+                                                          border-collapse: collapse;
+                                                          margin: 20px 0;
+                                                      }
+                                                      th, td {
+                                                          padding: 10px;
+                                                          text-align: left;
+                                                          border: 1px solid #ddd;
+                                                      }
+                                                      th {
+                                                        background:#4CAF50;
+                                                      }
+                                                      tr:nth-child(even) {
+                                                          background-color: #f9f9f9;
+                                                      }
+                                                  </style>
+                                              </head>
+                                              <body>
+                                                  ${printableContent}
+                                                  <script>
+                                                    (function(){
+                                                      function waitForImagesAndPrint(){
+                                                        var imgs = Array.prototype.slice.call(document.images);
+                                                        if(imgs.length === 0){ window.print(); return; }
+                                                        var loaded = 0;
+                                                        function done(){ if(++loaded === imgs.length){ setTimeout(function(){ window.print(); }, 100); } }
+                                                        imgs.forEach(function(img){
+                                                          if(img.complete){ done(); }
+                                                          else { img.addEventListener('load', done, { once: true }); img.addEventListener('error', done, { once: true }); }
+                                                        });
+                                                      }
+                                                      window.addEventListener('load', waitForImagesAndPrint);
+                                                      window.onafterprint = function(){ window.close(); };
+                                                    })();
+                                                  <\/script>
+                                              </body>
+                                              </html>
+                                              `);
                 printWindow.document.close();
-
-                // Print the content
-                printWindow.print();
-                printWindow.close();
+                
             },
             error: function(xhr, status, error) {
-                console.error("Error fetching attendance data:", error);
-                alert("Error fetching attendance data. Please try again.");
+                console.error("Error fetching financial data:", error);
+                alert("Error fetching financial data. Please try again.");
             }
             });
         }

@@ -107,3 +107,96 @@
     </div>
   </div>
 </div>
+
+<!-- CSV Upload Modal -->
+<div class="modal fade" id="csvUploadModal" tabindex="-1" role="dialog" aria-labelledby="csvUploadLabel">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title" id="csvUploadLabel">Upload SSS Contribution CSV</h4>
+      </div>
+      <form id="csv-upload-form" enctype="multipart/form-data">
+        <div class="modal-body">
+          <div class="alert alert-info">
+            <h4><i class="icon fa fa-info"></i> CSV Format Instructions</h4>
+            <p>Please ensure your CSV file follows this exact format (left to right):</p>
+            <ul>
+              <li><strong>Range of Compensation</strong> - Format: "0-5249.99" or "BELOW 5249.99"</li>
+              <li><strong>Employer Regular SS</strong> - Decimal number</li>
+              <li><strong>Employer MPF</strong> - Decimal number</li>
+              <li><strong>Employer EC</strong> - Decimal number</li>
+              <li><strong>Employer Total</strong> - Decimal number (auto-calculated)</li>
+              <li><strong>Employee Regular SS</strong> - Decimal number</li>
+              <li><strong>Employee MPF</strong> - Decimal number</li>
+              <li><strong>Employee Total</strong> - Decimal number (auto-calculated)</li>
+              <li><strong>Grand Total</strong> - Decimal number (auto-calculated)</li>
+            </ul>
+            <p><strong>Note:</strong> The first row should contain headers. Do not include the "Total" columns as they will be calculated automatically.</p>
+          </div>
+          
+          <div class="form-group">
+            <label for="csv-file">Select CSV File:</label>
+            <input type="file" class="form-control" id="csv-file" name="csv_file" accept=".csv" required>
+            <p class="help-block">Only CSV files are allowed. Maximum file size: 5MB</p>
+          </div>
+          
+          <div class="form-group">
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" id="backup-existing" name="backup_existing" checked>
+                Create backup of existing data before upload
+              </label>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" id="validate-only" name="validate_only">
+                Validate only (don't update data)
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-info" id="download-template">
+            <i class="fa fa-download"></i> Download Template
+          </button>
+          <button type="submit" class="btn btn-success">
+            <i class="fa fa-upload"></i> Upload CSV
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- CSV Upload Progress Modal -->
+<div class="modal fade" id="csvProgressModal" tabindex="-1" role="dialog" aria-labelledby="csvProgressLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="csvProgressLabel">Processing CSV Upload</h4>
+      </div>
+      <div class="modal-body">
+        <div class="progress">
+          <div class="progress-bar progress-bar-striped active" role="progressbar" style="width: 0%">
+            <span class="sr-only">0% Complete</span>
+          </div>
+        </div>
+        <p id="progress-text">Preparing upload...</p>
+        <div id="upload-results" style="display: none;">
+          <h5>Upload Results:</h5>
+          <div id="results-content"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="close-progress" style="display: none;">Close</button>
+      </div>
+    </div>
+  </div>
+</div>

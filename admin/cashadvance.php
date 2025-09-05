@@ -249,11 +249,10 @@ function getRow(id){
                 var printableContent = `
                 <div class="" style="display:flex;align-items:center;justify-content:center;flex-direction:row;text-align:center">
                 <div style="margin-right: 20px;">
-                    <img src="../images/ewn.png" class="img-responsive" id="ewn-logo" alt="img"  style="width: 100px">
+                    <img src="${window.location.origin}/payroll-system-ewn/images/logo.png" class="img-responsive" id="ewn-logo" alt="img"  style="width: 100px">
                 </div>
                 <center><h1><b>EWN Manpower Services</b></h1></center>
                 
-                <b style="margin-left: 20px;">09396193386<i class="fa fa-phone"></i><b><br>
                 <b style="margin-left: 20px;">ewn@gmail.com <i class="fa fa-envelope-o"></i><b><br>
                 <b style="margin-left: 20px;">Noveleta, Cavite <i class="fa fa-location-arrow"></i><b>
                 </div>
@@ -328,14 +327,27 @@ function getRow(id){
                                               </head>
                                               <body>
                                                   ${printableContent}
+                                                  <script>
+                                                    (function(){
+                                                      function waitForImagesAndPrint(){
+                                                        var imgs = Array.prototype.slice.call(document.images);
+                                                        if(imgs.length === 0){ window.print(); return; }
+                                                        var loaded = 0;
+                                                        function done(){ if(++loaded === imgs.length){ setTimeout(function(){ window.print(); }, 100); } }
+                                                        imgs.forEach(function(img){
+                                                          if(img.complete){ done(); }
+                                                          else { img.addEventListener('load', done, { once: true }); img.addEventListener('error', done, { once: true }); }
+                                                        });
+                                                      }
+                                                      window.addEventListener('load', waitForImagesAndPrint);
+                                                      window.onafterprint = function(){ window.close(); };
+                                                    })();
+                                                  <\/script>
                                               </body>
                                               </html>
                                               `);
                 printWindow.document.close();
-
-                // Print the content
-                printWindow.print();
-                printWindow.close();
+                
             },
             error: function(xhr, status, error) {
                 console.error("Error fetching payroll data:", error);
