@@ -73,6 +73,26 @@
         <div class="col-xs-12">
           <div class="box">
             <div class="box-header with-border">
+                <!-- finances filtering by date range -->
+                <div class="row">
+                  <form action="" method="POST">
+                  <div class="col-sm-10 align-right">
+                        <div class="date col-sm-2">
+                            <label for="dateFrom" class="col-form-label">Date from</label>
+                            <input type="text" class="form-control" id="dateFrom" name="dateFrom" required>
+                          </div>
+                          <div class="date col-sm-2">
+                            <label for="dateTo" class="col-form-label">Date to</label>
+                            <input type="text" class="form-control" id="dateTo" name="dateTo" required>
+                          </div>
+                          
+                          <div class="date col-sm-2" style="margin-top:25px">
+                            <button type="submit" class="btn btn-primary print">Print</button>
+                          </div>
+                    </div>
+                  </form>
+                </div><br><br>
+                <!-- finances filtering by date range -->
             </div>
             <div class="box-body">
               <!-- Nav tabs -->
@@ -313,6 +333,113 @@ function getRow(id){
     }
   });
 }
+
+// DATE RANGE PRINT
+function printFunction(dateFrom, dateTo) {
+// AJAX call to fetch data from the server
+$.ajax({
+    type: 'POST',
+    url: 'salary_calculation_fetch_data.php',
+    data: {
+        dateFrom: dateFrom,
+        dateTo: dateTo
+    },
+    dataType: 'json',
+    success: function(response) {
+        // Generate printable output using fetched data with EWN logo and styling
+        var printableContent = `
+        <div class="" style="display:flex;align-items:center;justify-content:center;flex-direction:row;text-align:center">
+        <div style="margin-right: 20px;">
+            <img src="${window.location.origin}/payroll-system-ewn/images/logo.png" class="img-responsive" id="ewn-logo" alt="img"  style="width: 100px">
+        </div>
+        <center><h1><b>EWN Manpower Services</b></h1></center>
+        
+        <b style="margin-left: 20px;">ewn@gmail.com <i class="fa fa-envelope-o"></i><b><br>
+        <b style="margin-left: 20px;">Noveleta, Cavite <i class="fa fa-location-arrow"></i><b>
+        </div>
+        `;
+        printableContent += "<h2>Finances Report</h2>";
+        printableContent += "<p>Date Range: " + dateFrom + " to " + dateTo + "</p>";
+        printableContent += "<table border='1' style='width:100%; border-collapse: collapse;'>";
+        printableContent += "<tr><th>Date Hatch</th><th>Location</th><th>Total DOC</th><th>Incentives Rate</th><th>Incentives Value Per Employee</th><th>Xtra Meal Allowance/Adjustments</th><th>Meal Allowance</th><th>Transportation</th><th>No. of EWN Crew</th><th>Total Cost</th></tr>";
+        
+        for (var i = 0; i < response.length; i++) {
+            printableContent += "<tr>";
+            printableContent += "<td>" + response[i].date + "</td>";
+            printableContent += "<td>" + response[i].province + ", " + response[i].municipality + "</td>";
+            printableContent += "<td>" + response[i].formatted_doc + "</td>";
+            printableContent += "<td>₱ " + response[i].formatted_incentives_rate + "</td>";
+            printableContent += "<td>₱ " + response[i].formatted_incentives_value + "</td>";
+            printableContent += "<td>₱ " + response[i].formatted_adjustments + "</td>";
+            printableContent += "<td>₱ " + response[i].formatted_meal_allowance + "</td>";
+            printableContent += "<td>₱ " + response[i].formatted_transportation + "</td>";
+            printableContent += "<td>" + response[i].formatted_crews + "</td>";
+            printableContent += "<td>₱ " + response[i].formatted_total_cost + "</td>";
+            printableContent += "</tr>";
+        }
+        printableContent += "</table>";
+        printableContent += `
+        <br><br><br>
+        
+        <div style="display:flex;align-items:right;justify-content:right;flex-direction:row;text-align:right">
+            <div style="text-align:center">
+              <span>Prepared by:</span><br>
+              <span style="font-size:20px !important"><?php echo isset($_SESSION['name']) ? $_SESSION['name'] : ''; ?></span><br>
+              <i><?php echo isset($_SESSION['role']) ? $_SESSION['role'] : ''; ?></i><br>
+              <span><?php echo date('Y-m-d H:i:s'); ?></span>
+            </div>
+        </div>
+        `;
+        
+        // Create a new window for printing
+        var printWindow = window.open('', '_blank');
+        printWindow.document.write(`
+            <html>
+            <head>
+                <title>Finances Report - ${dateFrom} to ${dateTo}</title>
+                <style>
+                    body { font-family: Arial, sans-serif; margin: 20px; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                    th { background-color: #f2f2f2; }
+                    .text-right { text-align: right; }
+                    h1, h2 { text-align: center; }
+                    @media print {
+                        body { margin: 0; }
+                        .no-print { display: none; }
+                    }
+                </style>
+            </head>
+            <body>
+                ${printableContent}
+            </body>
+            </html>
+            `);
+        printWindow.document.close();
+        
+        // Wait for the content to load, then trigger print dialog
+        printWindow.onload = function() {
+            printWindow.focus();
+            printWindow.print();
+            // Close the window after printing (optional)
+            // printWindow.close();
+        };
+    },
+    error: function(xhr, status, error) {
+        console.error("Error fetching finances data:", error);
+        alert("Error fetching finances data. Please try again.");
+    }
+    });
+}
+$(function() {
+    $('.print').click(function(e) {
+        e.preventDefault(); // Prevent the form from submitting normally
+        var dateFrom = $('#dateFrom').val(); // Get the value of dateFrom input
+        var dateTo = $('#dateTo').val(); // Get the value of dateTo input
+        printFunction(dateFrom, dateTo); // Call printFunction with dateFrom and dateTo values
+    });
+});
+// END DATE RANGE PRINT
 
 </script>
 
