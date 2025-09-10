@@ -240,8 +240,19 @@
                             //     exit();
                         }
                         
-                        //SSS employee contribution
-                        $sssEmpContribution = ($sssEmp * $tempBase_pay);
+                        //SSS employee contribution (schedule-based)
+                        $sssEmpContribution = 0;
+                        $stmtSss = $conn->prepare("SELECT regular_ss_employee, mpf_employee FROM sss_contribution_schedule WHERE active='yes' AND ? BETWEEN min_compensation AND max_compensation LIMIT 1");
+                        if($stmtSss){
+                            $stmtSss->bind_param("d", $tempBase_pay);
+                            if($stmtSss->execute()){
+                                $stmtSss->bind_result($regular_ss_employee_amt, $mpf_employee_amt);
+                                if($stmtSss->fetch()){
+                                    $sssEmpContribution = round((float)$regular_ss_employee_amt + (float)$mpf_employee_amt, 2);
+                                }
+                            }
+                            $stmtSss->close();
+                        }
                         //SSS employeerrr contribution
                         $sssEmployeerContribution = ($sssEmployeer * $tempBase_pay);
 

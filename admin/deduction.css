@@ -4,7 +4,7 @@
     border-collapse: collapse;
     margin: 20px 0;
     font-size: 12px;
-    transition: all 0.3s ease;
+    /* Removed transition to prevent table movement/compression */
 }
 
 .deduction-table th,
@@ -39,7 +39,7 @@
 
 .deduction-table tbody tr:hover {
     background-color: #e8f4fd;
-    transition: background-color 0.3s ease;
+    /* Removed transition to prevent table movement/compression */
 }
 
 /* Only show pointer cursor when in edit mode */
@@ -94,8 +94,7 @@
 .deduction-table.edit-mode tbody tr:hover {
     background-color: #fff3cd;
     border: 2px solid #f39c12;
-    transform: scale(1.01);
-    transition: all 0.2s ease;
+    /* Removed transform and transition to prevent table movement/compression */
 }
 
 .deduction-table.edit-mode .sss-row {

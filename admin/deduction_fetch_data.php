@@ -1,93 +1,170 @@
 <?php
+// Aggregates government contributions from posted payroll for printing
+// Inputs (POST): contribution (sss|philhealth|pagibig|income tax), dateFrom, dateTo, optional name
+// Output: JSON array of rows per employee with fields depending on contribution type
+
 include 'includes/session.php';
 
-// Allow from any origin
-header("Access-Control-Allow-Origin: *");
+header('Content-Type: application/json');
 
-// Allow specific methods
-header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
-
-// Allow specific headers
-header("Access-Control-Allow-Headers: Content-Type");
-
-// If this is an OPTIONS request, end the script here
-if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
-    exit(0);
+function respond_error($message){
+  echo json_encode([]);
+  exit;
 }
 
-if (isset($_POST['contribution']) && isset($_POST['payroll'])) {
-    $cont = !empty($_POST['contribution']) ? $_POST['contribution'] : null;
-    $payroll = trim($_POST['payroll']);
+$contribution = isset($_POST['contribution']) ? strtolower(trim($_POST['contribution'])) : '';
+$dateFrom = isset($_POST['dateFrom']) ? $_POST['dateFrom'] : '';
+$dateTo = isset($_POST['dateTo']) ? $_POST['dateTo'] : '';
+$nameFilter = isset($_POST['name']) ? trim($_POST['name']) : '';
 
-    // Verify valid contribution type
-    $validContributions = ['sss', 'philhealth', 'pagibig', 'income tax'];
-    if (!in_array($cont, $validContributions)) {
-        echo json_encode(array('error' => 'Invalid contribution type'));
-        exit();
+if(!$contribution || !$dateFrom || !$dateTo){
+  respond_error('Missing required parameters');
+}
+
+// Validate date format (YYYY-MM-DD)
+if(!preg_match('/^\d{4}-\d{2}-\d{2}$/', $dateFrom) || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $dateTo)){
+  respond_error('Invalid date format');
+}
+
+// Build base WHERE clause
+$where = "pe.created_on BETWEEN ? AND ? AND pe.status = 1";
+$params = [$dateFrom, $dateTo];
+$types = 'ss';
+
+// Optional name filter (case-insensitive contains)
+if($nameFilter !== ''){
+  $where .= " AND CONCAT(e.firstname,' ',e.lastname) LIKE ?";
+  $params[] = '%'.$nameFilter.'%';
+  $types .= 's';
+}
+
+$rows = [];
+
+if($contribution === 'philhealth' || $contribution === 'pagibig' || $contribution === 'income tax' || $contribution === 'income_tax'){
+  // Use aggregation directly from payroll_employee
+  $selectFields = '';
+  if($contribution === 'philhealth'){
+    $selectFields = 'SUM(CAST(pe.philhealth AS DECIMAL(12,2))) AS emp_total, SUM(CAST(pe.philhealth_employeer AS DECIMAL(12,2))) AS er_total';
+  } else if($contribution === 'pagibig'){
+    $selectFields = 'SUM(CAST(pe.pagibig AS DECIMAL(12,2))) AS emp_total, SUM(CAST(pe.pagibig_employeer AS DECIMAL(12,2))) AS er_total';
+  } else { // income tax
+    $selectFields = 'SUM(CAST(pe.tin AS DECIMAL(12,2))) AS emp_total, 0 AS er_total';
+  }
+
+  $sql = "SELECT pe.employee_id, e.firstname, e.lastname, $selectFields
+          FROM payroll_employee pe
+          LEFT JOIN employees e ON e.employee_id = pe.employee_id
+          WHERE $where
+          GROUP BY pe.employee_id, e.firstname, e.lastname
+          ORDER BY e.lastname ASC, e.firstname ASC";
+
+  $stmt = $conn->prepare($sql);
+  if(!$stmt){ respond_error('Query prepare failed'); }
+  $stmt->bind_param($types, ...$params);
+  if($stmt->execute()){
+    $result = $stmt->get_result();
+    while($r = $result->fetch_assoc()){
+      $employeeId = $r['employee_id'];
+      $name = trim(($r['firstname'] ?? '').' '.($r['lastname'] ?? ''));
+      $emp = round((float)$r['emp_total'], 2);
+      $er = round((float)$r['er_total'], 2);
+      $total = round($emp + $er, 2);
+
+      if($contribution === 'philhealth'){
+        $rows[] = [
+          'employee_id' => $employeeId,
+          'name' => $name,
+          'philhealth' => (float)$emp,
+          'philhealth_employeer' => (float)$er,
+          'total' => (float)$total,
+        ];
+      } else if($contribution === 'pagibig'){
+        $rows[] = [
+          'employee_id' => $employeeId,
+          'name' => $name,
+          'pagibig' => (float)$emp,
+          'pagibig_employeer' => (float)$er,
+          'total' => (float)$total,
+        ];
+      } else { // income tax (employee only)
+        $rows[] = [
+          'employee_id' => $employeeId,
+          'name' => $name,
+          'tin' => (float)$emp,
+          'total' => (float)$emp,
+        ];
+      }
     }
+  }
+  $stmt->close();
+}
+else if($contribution === 'sss'){
+  // For SSS: employee side from payroll_employee.sss; employer side recomputed per schedule bracket
 
-    // Prepare SQL query based on contribution type
-    switch ($cont) {
-        case 'sss':
-            $sql = "SELECT CONCAT(em.firstname, ' ', em.lastname) AS name,
-                    pe.employee_id,
-                    pe.sss,
-                    pe.sss_employeer,
-                    (CAST(pe.sss AS DECIMAL(10,2)) + CAST(pe.sss_employeer AS DECIMAL(10,2))) AS total
-                    FROM payroll_employee AS pe
-                    LEFT JOIN employees AS em ON em.employee_id = pe.employee_id
-                    WHERE date_range = '$payroll'
-                    ORDER BY pe.id DESC";
-            break;
-        case 'philhealth':
-            $sql = "SELECT CONCAT(em.firstname, ' ', em.lastname) AS name,
-                    pe.employee_id,
-                    pe.philhealth,
-                    pe.philhealth_employeer,
-                    (CAST(pe.philhealth AS DECIMAL(10,2))) AS total
-                    FROM payroll_employee AS pe
-                    LEFT JOIN employees AS em ON em.employee_id = pe.employee_id
-                    WHERE date_range = '$payroll'
-                    ORDER BY pe.id DESC";
-            break;
-        case 'pagibig':
-            $sql = "SELECT CONCAT(em.firstname, ' ', em.lastname) AS name,
-                    pe.employee_id,
-                    pe.pagibig,
-                    pe.pagibig_employeer,
-                    (CAST(pe.pagibig AS DECIMAL(10,2))) AS total
-                    FROM payroll_employee AS pe
-                    LEFT JOIN employees AS em ON em.employee_id = pe.employee_id
-                    WHERE date_range = '$payroll'
-                    ORDER BY pe.id DESC";
-            break;
-        case 'income tax':
-            $sql = "SELECT CONCAT(em.firstname, ' ', em.lastname) AS name,
-                    pe.employee_id,
-                    pe.tin,
-                    (CAST(pe.tin AS DECIMAL(10,2))) AS total
-                    FROM payroll_employee AS pe
-                    LEFT JOIN employees AS em ON em.employee_id = pe.employee_id
-                    WHERE date_range = '$payroll'
-                    ORDER BY pe.id DESC";
-            break;
+  // Prefetch schedule into a map: employee_total => employer_total
+  $mapEmpToEr = [];
+  $schedSql = "SELECT (regular_ss_employee + mpf_employee) AS emp_total, (regular_ss_employer + mpf_employer + ec_employer) AS er_total FROM sss_contribution_schedule WHERE active='yes'";
+  $schedRes = $conn->query($schedSql);
+  if($schedRes){
+    while($s = $schedRes->fetch_assoc()){
+      $empKey = number_format((float)$s['emp_total'], 2, '.', '');
+      $mapEmpToEr[$empKey] = round((float)$s['er_total'], 2);
     }
+  }
 
-    // Execute query and fetch results
-    if ($stmt = $conn->prepare($sql)) {
-        $stmt->execute();
-        $result = $stmt->get_result();
-        
-        $financialData = array();
-        while ($row = $result->fetch_assoc()) {
-            $financialData[] = $row;
+  // Fetch per-row SSS values to map to employer via schedule, then aggregate per employee
+  $sql = "SELECT pe.employee_id, e.firstname, e.lastname, CAST(pe.sss AS DECIMAL(12,2)) AS sss_emp
+          FROM payroll_employee pe
+          LEFT JOIN employees e ON e.employee_id = pe.employee_id
+          WHERE $where
+          ORDER BY e.lastname ASC, e.firstname ASC";
+
+  $stmt = $conn->prepare($sql);
+  if(!$stmt){ respond_error('Query prepare failed'); }
+  $stmt->bind_param($types, ...$params);
+
+  $perEmployee = [];
+  if($stmt->execute()){
+    $result = $stmt->get_result();
+    while($r = $result->fetch_assoc()){
+      $employeeId = $r['employee_id'];
+      $name = trim(($r['firstname'] ?? '').' '.($r['lastname'] ?? ''));
+      $empAmt = round((float)$r['sss_emp'], 2);
+      if($empAmt <= 0){
+        // still register employee for name if not present
+        if(!isset($perEmployee[$employeeId])){
+          $perEmployee[$employeeId] = ['name' => $name, 'emp' => 0.00, 'er' => 0.00];
         }
-        
-        echo json_encode($financialData);
-    } else {
-        echo json_encode(array('error' => 'Database query failed'));
+        continue;
+      }
+      $empKey = number_format($empAmt, 2, '.', '');
+      $erAmt = isset($mapEmpToEr[$empKey]) ? $mapEmpToEr[$empKey] : 0.00;
+
+      if(!isset($perEmployee[$employeeId])){
+        $perEmployee[$employeeId] = ['name' => $name, 'emp' => 0.00, 'er' => 0.00];
+      }
+      $perEmployee[$employeeId]['emp'] += $empAmt;
+      $perEmployee[$employeeId]['er'] += $erAmt;
     }
-} else {
-    echo json_encode(array('error' => 'Invalid request'));
+  }
+  $stmt->close();
+
+  // Build rows array
+  foreach($perEmployee as $empId => $v){
+    $empSum = round($v['emp'], 2);
+    $erSum = round($v['er'], 2);
+    $rows[] = [
+      'employee_id' => $empId,
+      'name' => $v['name'],
+      'sss' => (float)$empSum,
+      'sss_employeer' => (float)$erSum,
+      'total' => (float)($empSum + $erSum),
+    ];
+  }
 }
-?>
+else{
+  respond_error('Invalid contribution type');
+}
+
+echo json_encode($rows);
+exit;

@@ -66,17 +66,23 @@
                     $sql = "SELECT * FROM deductions";
                     $query = $conn->query($sql);
                     while($row = $query->fetch_assoc()){
-                      echo "
+                      // SSS in Deduction Settings is disabled; SSS is managed via sss_contribution_schedule
+                      $isSSS = strtoupper(trim($row['description'])) === 'SSS';
+                  ?>
                         <tr>
-                          <td>".$row['id']."</td>
-                          <td class='text-right'>".$row['description']."</td>
-                          <td class='text-left'>".$row['employee_contribution']."</td>
-                          <td class='text-left'>".$row['employeer_contribution']."</td>
+                          <td><?php echo $row['id']; ?></td>
+                          <td class='text-right'><?php echo $row['description']; ?><?php echo $isSSS ? " <span class='label label-default' title='Managed via SSS Contribution Schedule'>(disabled)</span>" : ""; ?></td>
+                          <td class='text-left'><?php echo $row['employee_contribution']; ?></td>
+                          <td class='text-left'><?php echo $row['employeer_contribution']; ?></td>
                           <td>
-                            <button class='btn btn-success btn-sm edit btn-flat' data-id='".$row['id']."'><i class='fa fa-edit'></i> Edit</button>
+                            <?php if($isSSS){ ?>
+                              <button class='btn btn-default btn-sm btn-flat' disabled title="Disabled - SSS is managed in SSS Contribution Schedule"><i class='fa fa-ban'></i> Disabled</button>
+                            <?php } else { ?>
+                              <button class='btn btn-success btn-sm edit btn-flat' data-id='<?php echo $row['id']; ?>'><i class='fa fa-edit'></i> Edit</button>
+                            <?php } ?>
                           </td>
                         </tr>
-                      ";
+                  <?php
                     }
                   ?>
                 </tbody>
@@ -148,7 +154,7 @@
                   </thead>
                   <tbody>
                     <?php
-                      // Fetch SSS contribution data from database
+                      // Fetch SSS contribution data from database  
                       $sql_sss = "SELECT * FROM sss_contribution_schedule ORDER BY min_compensation ASC";
                       $query_sss = $conn->query($sql_sss);
                       
@@ -261,8 +267,11 @@
                           </div>
                       </div>
                       <div class="col-sm-4">
-                         <label for="payroll" class="control-label">Date range</label>
-                            <input type="text" class="form-control check-payroll" id="payroll" name="payroll" required>
+                         <label for="dateFrom" class="control-label">Date from</label>
+                            <input type="text" class="form-control" id="dateFrom" name="dateFrom" required>
+                          <br/>
+                         <label for="dateTo" class="control-label">Date to</label>
+                            <input type="text" class="form-control" id="dateTo" name="dateTo" required>
                           <br/><br/> 
                           <div class="d-flex justify-content-end mt-3">
                               <button type="button" class="btn btn-primary generate">Generate</button>
@@ -302,6 +311,12 @@
     // Ensure all input handling scripts are correctly closed
     $('#employeer-contribution, #employee-contribution, #edit-employeer-contribution, #edit-employee-contribution').on('input', function() {
       this.value = this.value.replace(/[^0-9.]/g, '');
+    });
+    
+    // Initialize datepicker for date range inputs
+    $('#dateFrom, #dateTo').datepicker({
+      autoclose: true,
+      format: 'yyyy-mm-dd'
     });
   });
 </script>
@@ -962,11 +977,12 @@ BELOW 5249.99,500.00,0.00,10.00,250.00,0.00
     
     generateButton.addEventListener('click', function() {
       const contribution = document.querySelector("input[name='contribution']:checked").value;
-      const payroll = document.getElementById('payroll').value;
-      fetchData(contribution, payroll);
+      const dateFrom = document.getElementById('dateFrom').value;
+      const dateTo = document.getElementById('dateTo').value;
+      fetchData(contribution, dateFrom, dateTo);
     });
 
-    function fetchData(contribution, payroll) {
+    function fetchData(contribution, dateFrom, dateTo) {
       var xhr = new XMLHttpRequest();
       xhr.open('POST', 'deduction_fetch_data.php', true);
       xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
@@ -984,7 +1000,7 @@ BELOW 5249.99,500.00,0.00,10.00,250.00,0.00
             </div>`;
           printableContent += "<h1>Contribution report</h1>";
           printableContent += "<p>Contribution: " + contribution + "</p>";
-          printableContent += "<p>Date range: " + payroll + "</p>";
+          printableContent += "<p>Date range: " + dateFrom + " to " + dateTo + "</p>";
           printableContent += "<table border=''>";
 
           let overAll = 0;
@@ -1118,7 +1134,7 @@ BELOW 5249.99,500.00,0.00,10.00,250.00,0.00
           
         }
       };
-      xhr.send("contribution=" + contribution + "&payroll=" + payroll);
+      xhr.send("contribution=" + contribution + "&dateFrom=" + dateFrom + "&dateTo=" + dateTo);
     }
   });
 </script>

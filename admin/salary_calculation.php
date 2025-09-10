@@ -412,18 +412,26 @@ $.ajax({
             </head>
             <body>
                 ${printableContent}
+                <script>
+                  (function(){
+                    function waitForImagesAndPrint(){
+                      var imgs = Array.prototype.slice.call(document.images);
+                      if(imgs.length === 0){ window.print(); return; }
+                      var loaded = 0;
+                      function done(){ if(++loaded === imgs.length){ setTimeout(function(){ window.print(); }, 100); } }
+                      imgs.forEach(function(img){
+                        if(img.complete){ done(); }
+                        else { img.addEventListener('load', done, { once: true }); img.addEventListener('error', done, { once: true }); }
+                      });
+                    }
+                    window.addEventListener('load', waitForImagesAndPrint);
+                    window.onafterprint = function(){ window.close(); };
+                  })();
+                <\/script>
             </body>
             </html>
             `);
         printWindow.document.close();
-        
-        // Wait for the content to load, then trigger print dialog
-        printWindow.onload = function() {
-            printWindow.focus();
-            printWindow.print();
-            // Close the window after printing (optional)
-            // printWindow.close();
-        };
     },
     error: function(xhr, status, error) {
         console.error("Error fetching finances data:", error);
