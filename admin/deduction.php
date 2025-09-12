@@ -136,13 +136,13 @@
               <div class="table-container">
                 <table class="deduction-table table table-bordered table-striped">
                   <thead>
-                    <tr class="bg-primary">
+                    <tr style="background-color: #1e5bc6; color: white;">
                       <th rowspan="2" class="text-center">RANGE OF<br>COMPENSATION</th>
                       <th colspan="4" class="text-center">EMPLOYER CONTRIBUTION</th>
                       <th colspan="3" class="text-center">EMPLOYEE CONTRIBUTION</th>
                       <th rowspan="2" class="text-center">TOTAL</th>
                     </tr>
-                    <tr class="bg-info">
+                    <tr style="background-color: #5a8fdc; color: white;">
                       <th class="sub-header text-center">REGULAR SS</th>
                       <th class="sub-header text-center">MPF</th>
                       <th class="sub-header text-center">EC</th>
@@ -159,9 +159,22 @@
                       $query_sss = $conn->query($sql_sss);
                       
                       if($query_sss->num_rows > 0) {
-                        while($row_sss = $query_sss->fetch_assoc()) {
-                          $range_text = $row_sss['min_compensation'] == 0 ? 'BELOW ' . number_format($row_sss['max_compensation']) : 
-                                       number_format($row_sss['min_compensation']) . ' - ' . number_format($row_sss['max_compensation']);
+                        $sss_data = [];
+                        while($row = $query_sss->fetch_assoc()){
+                          $sss_data[] = $row;
+                        }
+
+                        foreach($sss_data as $index => $row_sss) {
+                          $isLastRow = ($index === count($sss_data) - 1);
+                          
+                          $range_text = '';
+                          if ($row_sss['min_compensation'] == 0) {
+                              $range_text = 'BELOW ' . number_format($row_sss['max_compensation']);
+                          } else if ($isLastRow) {
+                              $range_text = number_format($row_sss['min_compensation']) . ' - OVER';
+                          } else {
+                              $range_text = number_format($row_sss['min_compensation']) . ' - ' . number_format($row_sss['max_compensation']);
+                          }
                           
                           $employer_total = $row_sss['regular_ss_employer'] + $row_sss['mpf_employer'] + $row_sss['ec_employer'];
                           $employee_total = $row_sss['regular_ss_employee'] + $row_sss['mpf_employee'];
@@ -267,15 +280,12 @@
                           </div>
                       </div>
                       <div class="col-sm-4">
-                         <label for="dateFrom" class="control-label">Date from</label>
-                            <input type="text" class="form-control" id="dateFrom" name="dateFrom" required>
-                          <br/>
-                         <label for="dateTo" class="control-label">Date to</label>
-                            <input type="text" class="form-control" id="dateTo" name="dateTo" required>
-                          <br/><br/> 
-                          <div class="d-flex justify-content-end mt-3">
-                              <button type="button" class="btn btn-primary generate">Generate</button>
-                          </div>
+                         <label for="month" class="control-label">Month</label>
+                           <input type="text" class="form-control" id="month" name="month" required>
+                         <br/><br/> 
+                         <div class="d-flex justify-content-end mt-3">
+                             <button type="button" class="btn btn-primary generate">Generate</button>
+                         </div>
                       </div>
                       <div class="col-sm-2"></div>
                   </div>
@@ -313,10 +323,13 @@
       this.value = this.value.replace(/[^0-9.]/g, '');
     });
     
-    // Initialize datepicker for date range inputs
-    $('#dateFrom, #dateTo').datepicker({
+    // Initialize datepicker for month selector
+    $('#month').datepicker({
       autoclose: true,
-      format: 'yyyy-mm-dd'
+      format: 'yyyy-mm',
+      startView: "months",
+      minViewMode: "months",
+      todayHighlight: true
     });
   });
 </script>
@@ -977,47 +990,54 @@ BELOW 5249.99,500.00,0.00,10.00,250.00,0.00
     
     generateButton.addEventListener('click', function() {
       const contribution = document.querySelector("input[name='contribution']:checked").value;
-      const dateFrom = document.getElementById('dateFrom').value;
-      const dateTo = document.getElementById('dateTo').value;
-      fetchData(contribution, dateFrom, dateTo);
+      let month = document.getElementById('month').value;
+      console.log('Month value from input:', month);
+      
+      // Ensure we have full year-month format
+      if (month && month.length === 2) {
+        // If only month is provided, assume current year
+        const currentYear = new Date().getFullYear();
+        month = currentYear + '-' + month.padStart(2, '0');
+        console.log('Converted month to:', month);
+      }
+      
+      fetchData(contribution, month);
     });
 
-    function fetchData(contribution, dateFrom, dateTo) {
+    function fetchData(contribution, month) {
+      console.log('Fetching data for:', contribution, month);
       var xhr = new XMLHttpRequest();
       xhr.open('POST', 'deduction_fetch_data.php', true);
       xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
       xhr.onload = function() {
+        console.log('Response status:', xhr.status);
+        console.log('Response text:', xhr.responseText);
         if (xhr.status >= 200 && xhr.status < 300) {
           var response = JSON.parse(xhr.responseText);
-          // Format contribution type for display
-          var contributionDisplay = contribution.charAt(0).toUpperCase() + contribution.slice(1);
-          if (contribution === 'income tax') {
-            contributionDisplay = 'Income Tax';
-          }
-          
+          console.log('Parsed response:', response);
           var printableContent = `
-            <div style="text-align: center; margin-bottom: 30px;">
-              <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
-                <img src="${window.location.origin}/payroll-system-ewn/images/logo.png" class="img-responsive" id="ewn-logo" alt="img" style="width: 100px; margin-right: 20px;">
-                <div style="text-align: left;">
-                  <div style="font-size: 14px; margin-bottom: 5px;"><b>ewn@gmail.com <i class="fa fa-envelope-o"></i></b></div>
-                </div>
+            <div style="display:flex;align-items:center;justify-content:center;flex-direction:row;text-align:center">
+              <div style="margin-right: 20px;">
+                <img src="${window.location.origin}/payroll-system-ewn/images/logo.png" class="responsive-img" id="ewn-logo" alt="img" style="width: 100px">
               </div>
-              <div style="margin-bottom: 40px;">
-                <h1 style="margin: 0; font-size: 24px; font-weight: bold;">EWN Manpower Services</h1>
-                <p style="margin: 10px 0 0 0; font-size: 16px; font-weight: bold;">San Antonio I, Noveleta, Cavite</p>
-              </div>
-              <div style="margin-bottom: 30px;">
-                <h1 style="margin: 0; font-size: 24px; font-weight: bold;">${contributionDisplay}</h1>
-                <p style="margin: 10px 0 0 0; font-size: 16px; font-weight: bold;">Contribution Report</p>
-              </div>
+              <center><h1><b>EWN Manpower Services</b></h1></center>
+              <b style="margin-left: 20px;">ewn@gmail.com <i class="fa fa-envelope-o"></i></b>
+              <b style="margin-left: 20px;">Noveleta, Cavite <i class="fa fa-location-arrow"></i></b>
             </div>`;
-          printableContent += "<p style='text-align: center; margin-bottom: 20px;'><b>Date range: " + dateFrom + " to " + dateTo + "</b></p>";
-          printableContent += "<table border=''>";
+          printableContent += "<h1>Contribution report</h1>";
+          printableContent += "<p>Contribution: " + contribution + "</p>";
+          printableContent += "<p>Month: " + month + "</p>";
+          printableContent += "<p>Response length: " + response.length + "</p>";
+          
+          if(response.length === 0){
+            printableContent += "<p>No payroll data found for the selected month.</p>";
+          }
+          else{
+            printableContent += "<table border=''>";
 
-          let overAll = 0;
-          if (contribution === 'sss') {
-            printableContent += `
+            let overAll = 0;
+            if (contribution === 'sss') {
+              printableContent += `
               <tr>
                 <th>Employee ID</th>
                 <th>Name</th>
@@ -1025,63 +1045,83 @@ BELOW 5249.99,500.00,0.00,10.00,250.00,0.00
                 <th>Employer contribution</th>
                 <th>Total</th>
               </tr>`;
-            for (var i = 0; i < response.length; i++) {
-              printableContent += "<tr>";
-              printableContent += "<td>" + response[i].employee_id + "</td>";
-              printableContent += "<td>" + response[i].name + "</td>";
-              printableContent += "<td>" + response[i].sss + "</td>";
-              printableContent += "<td>" + response[i].sss_employeer + "</td>";
-              printableContent += "<td>" + response[i].total + "</td>";
-              printableContent += "</tr>";
-              overAll += parseFloat(response[i].total);
-            }
-          } else {
-            printableContent += `
-              <tr>
-                <th>Employee ID</th>
-                <th>Name</th>`;
-            if (contribution === "pagibig") {
-              printableContent += "<th>Employee contribution</th>";
-              printableContent += "<th>Employer contribution</th>";
-            }
-            if (contribution === "philhealth") {
-              printableContent += "<th>Employee contribution</th>";
-              printableContent += "<th>Employer contribution</th>";
-            }
-            if (contribution === "income tax") {
-              printableContent += "<th>Employee contribution</th>";
-            }
-            printableContent += "<th>Total</th>";
-            printableContent += "</tr>";
-            for (var i = 0; i < response.length; i++) {
-              printableContent += "<tr>";
-              printableContent += "<td>" + response[i].employee_id + "</td>";
-              printableContent += "<td>" + response[i].name + "</td>";
-              if (contribution === "pagibig") {
-                printableContent += "<td>" + response[i].pagibig + "</td>";
-                printableContent += "<td>" + response[i].pagibig_employeer + "</td>";
+              for (var i = 0; i < response.length; i++) {
+                printableContent += "<tr>";
+                printableContent += "<td>" + response[i].employee_id + "</td>";
+                printableContent += "<td>" + response[i].name + "</td>";
+                printableContent += "<td>" + response[i].sss.toFixed(2) + "</td>";
+                printableContent += "<td>" + response[i].sss_employeer.toFixed(2) + "</td>";
+                printableContent += "<td>" + response[i].total.toFixed(2) + "</td>";
+                printableContent += "</tr>";
+                overAll += parseFloat(response[i].total);
               }
-              if (contribution === "philhealth") {
-                printableContent += "<td>" + response[i].philhealth + "</td>";
-                printableContent += "<td>" + response[i].philhealth_employeer + "</td>";
-              }
-              if (contribution === "income tax") {
-                printableContent += "<td>" + response[i].tin + "</td>";
-              }
-              printableContent += "<td>" + response[i].total + "</td>";
-              printableContent += "</tr>";
-              overAll += parseFloat(response[i].total);
+            } else if (contribution === 'pagibig') {
+                printableContent += `
+                <tr>
+                  <th>Employee ID</th>
+                  <th>Name</th>
+                  <th>Employee contribution</th>
+                  <th>Employer contribution</th>
+                  <th>Total</th>
+                </tr>`;
+                for (var i = 0; i < response.length; i++) {
+                  printableContent += "<tr>";
+                  printableContent += "<td>" + response[i].employee_id + "</td>";
+                  printableContent += "<td>" + response[i].name + "</td>";
+                  printableContent += "<td>" + response[i].pagibig.toFixed(2) + "</td>";
+                  printableContent += "<td>" + response[i].pagibig_employeer.toFixed(2) + "</td>";
+                  printableContent += "<td>" + response[i].total.toFixed(2) + "</td>";
+                  printableContent += "</tr>";
+                  overAll += parseFloat(response[i].total);
+                }
+            } else if (contribution === 'philhealth') {
+                printableContent += `
+                <tr>
+                  <th>Employee ID</th>
+                  <th>Name</th>
+                  <th>Employee contribution</th>
+                  <th>Employer contribution</th>
+                  <th>Total</th>
+                </tr>`;
+                for (var i = 0; i < response.length; i++) {
+                  printableContent += "<tr>";
+                  printableContent += "<td>" + response[i].employee_id + "</td>";
+                  printableContent += "<td>" + response[i].name + "</td>";
+                  printableContent += "<td>" + response[i].philhealth.toFixed(2) + "</td>";
+                  printableContent += "<td>" + response[i].philhealth_employeer.toFixed(2) + "</td>";
+                  printableContent += "<td>" + response[i].total.toFixed(2) + "</td>";
+                  printableContent += "</tr>";
+                  overAll += parseFloat(response[i].total);
+                }
+            } else if (contribution === 'income tax') {
+                printableContent += `
+                <tr>
+                  <th>Employee ID</th>
+                  <th>Name</th>
+                  <th>Employee contribution</th>
+                  <th>Total</th>
+                </tr>`;
+                for (var i = 0; i < response.length; i++) {
+                  printableContent += "<tr>";
+                  printableContent += "<td>" + response[i].employee_id + "</td>";
+                  printableContent += "<td>" + response[i].name + "</td>";
+                  printableContent += "<td>" + response[i].tin.toFixed(2) + "</td>";
+                  printableContent += "<td>" + response[i].total.toFixed(2) + "</td>";
+                  printableContent += "</tr>";
+                  overAll += parseFloat(response[i].total);
+                }
             }
-          }
 
-          printableContent += "<tr>";
-          printableContent += "<th></th>";
-          printableContent += "<th></th>";
-          printableContent += "<th></th>";
-          printableContent += "<th>Total</th>";
-          printableContent += "<th>" + parseFloat(overAll).toLocaleString() + "</th>";
-          printableContent += "</tr>";
-          printableContent += "</table>";
+            printableContent += "<tr>";
+            if (contribution === 'income tax') {
+              printableContent += "<th colspan='3' style='text-align:right;'>Total</th>";
+            } else {
+              printableContent += "<th colspan='4' style='text-align:right;'>Total</th>";
+            }
+            printableContent += "<th>" + parseFloat(overAll).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "</th>";
+            printableContent += "</tr>";
+            printableContent += "</table>";
+          }
           printableContent += `
             <br><br><br>
             <div style="display:flex;align-items:right;justify-content:right;flex-direction:row;text-align:right">
@@ -1146,7 +1186,7 @@ BELOW 5249.99,500.00,0.00,10.00,250.00,0.00
           
         }
       };
-      xhr.send("contribution=" + contribution + "&dateFrom=" + dateFrom + "&dateTo=" + dateTo);
+      xhr.send("contribution=" + contribution + "&month=" + month);
     }
   });
 </script>

@@ -1,5 +1,15 @@
 <?php
 	include 'includes/session.php';
+
+    // Fetch deduction rates once
+    $deductions_sql = "SELECT description, employee_contribution, employeer_contribution FROM deductions";
+    $deductions_query = $conn->query($deductions_sql);
+    $deduction_rates = [];
+    while($row = $deductions_query->fetch_assoc()){
+        $desc = strtolower(trim($row['description']));
+        $deduction_rates[$desc] = $row;
+    }
+
 	if(isset($_POST['addPayroll'])){
 
         $dateFrom="";
@@ -56,13 +66,7 @@
                 CAST(efl.salary AS DECIMAL(10,2)) AS rate,
                 CAST(efl.leave_credits AS DECIMAL(10,2)) AS leave_credits,
                 COUNT(DISTINCT efl.date) AS days_of_work,
-                efl.employee_id AS employee_id,
-                efl.sss_emp AS sss_emp,
-                efl.pagibig_emp AS pagibig_emp,
-                efl.philhealth_emp AS philhealth_emp,
-                efl.sss_emp AS sss_employeer,
-                efl.pagibig_emp AS pagibig_employeer,
-                efl.philhealth_emp AS philhealth__employeer
+                efl.employee_id AS employee_id
                 FROM employee_financial_list AS efl
                 LEFT JOIN employees ON employees.employee_id = efl.employee_id
                 WHERE efl.date BETWEEN '$dateFrom' AND '$dateTo' AND employees.archive = 'no'
@@ -111,49 +115,6 @@
                         }else{
                             $salary += ($daysOfWork * $rate);
                         }
-
-                    // echo "
-                    // Incentives value: $incentivesValue<br>
-                    // employee days worked: $daysOfWork<br>
-                    // Number of work days: $greater_num_days_of_work<br>
-                    // ";
-                    //     exit();
-                    
-
-                        // $_SESSION['success'] = "mealAllowance:  $mealAllowance\n
-                            // adjustments:  $adjustments\n
-                            // transportation:  $transportation\n
-                            // Incentives value:  $incentivesValue\n";
-
-                        //EmployeeR contribution
-                        $sssEmployeer = !empty((float)$row2["sss_employeer"]) ? $row2["sss_employeer"] : 1;
-                        // $tinEmployeer = !empty((float)$row2["tin_employeer"]) ? $row2["tin_employeer"] : 0;
-                        $philhealthEmployeer = !empty((float)$row2["philhealth_employeer"]) ? $row2["philhealth_employeer"] : 1;
-                        $pagibigEmployeer = !empty((float)$row2["pagibig_employeer"]) ? $row2["pagibig_employeer"] : 0;
-                        
-                        //TEST employeer contribution
-                            // $_SESSION['success'] = "sss_employeer:  $sssEmployeer\n
-                            // tin_employeer:  $tinEmployeer\n
-                            // philhealth_employeer:  $philhealthEmployeer\n
-                            // pagibig_employeer:  $pagibigEmployeer\n";
-
-                        //EmployeE contribution
-                        $sssEmp = !empty((float)$row2["sss_emp"]) ? $row2["sss_emp"] : 1;
-                        // $tinEmp = !empty((float)$row2["tin_emp"]) ? $row2["tin_emp"] : 0;
-                        $philhealthEmp = !empty((float)$row2["philhealth_emp"]) ? $row2["philhealth_emp"] : 1;
-                        $pagibigEmp = !empty((float)$row2["pagibig_emp"]) ? $row2["pagibig_emp"] : 0;                    
-                
-                        // TEST emp contribution
-                            //$_SESSION['success'] = "
-                            //sss_employeer:  $sssEmployeer\n
-                            //tin_employeer:  $tinEmployeer\n
-                            //philhealth_employeer:  $philhealthEmployeer\n
-                            //pagibig_employeer:  $pagibigEmployeer\n
-                            //sss_emp:  $sssEmp\n
-                            //tin_emp:  $tinEmp\n
-                            //philhealth_emp:  $philhealthEmp\n
-                            //pagibig_emp:  $pagibigEmp\n
-                            //";
 
                         $grossEarnings = $mealAllowance + $adjustments + $transportation + $incentivesValue + $salary;
                         //creeate temp to pass the gross earning value
@@ -240,42 +201,54 @@
                             //     exit();
                         }
                         
-                        //SSS employee contribution (schedule-based)
+                        // SSS employee and employer contribution (schedule-based)
                         $sssEmpContribution = 0;
-                        $stmtSss = $conn->prepare("SELECT regular_ss_employee, mpf_employee FROM sss_contribution_schedule WHERE active='yes' AND ? BETWEEN min_compensation AND max_compensation LIMIT 1");
+                        $sssEmployeerContribution = 0;
+                        $stmtSss = $conn->prepare("SELECT regular_ss_employee, mpf_employee, regular_ss_employer, mpf_employer, ec_employer FROM sss_contribution_schedule WHERE active='yes' AND ? BETWEEN min_compensation AND max_compensation LIMIT 1");
                         if($stmtSss){
                             $stmtSss->bind_param("d", $tempBase_pay);
                             if($stmtSss->execute()){
-                                $stmtSss->bind_result($regular_ss_employee_amt, $mpf_employee_amt);
+                                $stmtSss->bind_result($regular_ss_employee_amt, $mpf_employee_amt, $regular_ss_employer_amt, $mpf_employer_amt, $ec_employer_amt);
                                 if($stmtSss->fetch()){
                                     $sssEmpContribution = round((float)$regular_ss_employee_amt + (float)$mpf_employee_amt, 2);
+                                    // Only calculate employer contribution if employee contribution > 0
+                                    if($sssEmpContribution > 0) {
+                                        $sssEmployeerContribution = round((float)$regular_ss_employer_amt + (float)$mpf_employer_amt + (float)$ec_employer_amt, 2);
+                                    }
                                 }
                             }
                             $stmtSss->close();
                         }
-                        //SSS employeerrr contribution
-                        $sssEmployeerContribution = ($sssEmployeer * $tempBase_pay);
+
+                        // Get PhilHealth and Pag-IBIG rates from the fetched deduction rates
+                        $philhealthEmpRate = isset($deduction_rates['philhealth']) ? (float)$deduction_rates['philhealth']['employee_contribution'] : 0;
+                        $philhealthEmployeerRate = isset($deduction_rates['philhealth']) ? (float)$deduction_rates['philhealth']['employeer_contribution'] : 0;
+                        $pagibigEmpContribution = isset($deduction_rates['pagibig']) ? (float)$deduction_rates['pagibig']['employee_contribution'] : 0;
 
                         //Philhealth employee contribution
-                        $philhealthEmpContribution = ($philhealthEmp * $tempBase_pay);
-                        //Philhealth employeeRR contribution
-                        $philhealthEmployeerContribution = ($philhealthEmployeer * $tempBase_pay);
+                        $philhealthEmpContribution = round($philhealthEmpRate * $tempBase_pay, 2);
+                        //Philhealth employer contribution - only calculate if employee contribution > 0
+                        $philhealthEmployeerContribution = 0;
+                        if($philhealthEmpContribution > 0) {
+                            $philhealthEmployeerContribution = round($philhealthEmployeerRate * $tempBase_pay, 2);
+                        }
 
-                        //pagibig employee contribution
-                        $pagibigEmpContribution = ($pagibigEmp);
-                        //pagibig employeeRR contribution
-                        $pagibigEmployeerContribution = ($pagibigEmployeer);
+                        // Pag-IBIG employer contribution - only calculate if employee contribution > 0
+                        $pagibigEmployeerContribution = 0;
+                        if($pagibigEmpContribution > 0) {
+                            $pagibigEmployeerContribution = isset($deduction_rates['pagibig']) ? (float)$deduction_rates['pagibig']['employeer_contribution'] : 0;
+                        }
 
                         // $test = "<br>
-                            // basepay:$tempBase_pay<br>
-                            // ssemployee: $sssEmpContribution($sssEmp)<br>
-                            // ssemployeeR: $sssEmployeerContribution($sssEmployeer)<br>
-                            // philhealthemployee: $philhealthEmpContribution($philhealthEmp)<br>
-                            // philhealthemployeRR: $philhealthEmployeerContribution($philhealthEmployeer)<br>
-                            // pagibigemployee: $pagibigEmpContribution($philhealthEmp)<br>
-                            // pagibigemployeRR: $pagibigEmployeerContribution($pagibigEmployeer)<br>
-                            // ";
-                            // echo $test;
+                        //     basepay:$tempBase_pay<br>
+                        //     ssemployee: $sssEmpContribution($sssEmp)<br>
+                        //     ssemployeeR: $sssEmployeerContribution($sssEmployeer)<br>
+                        //     philhealthemployee: $philhealthEmpContribution($philhealthEmp)<br>
+                        //     philhealthemployeRR: $philhealthEmployeerContribution($philhealthEmployeer)<br>
+                        //     pagibigemployee: $pagibigEmpContribution($philhealthEmp)<br>
+                        //     pagibigemployeRR: $pagibigEmployeerContribution($pagibigEmployeer)<br>
+                        //     ";
+                        //     echo $test;
                          // exit();
                         //total deductions
                         $totalDeduction = 0;
