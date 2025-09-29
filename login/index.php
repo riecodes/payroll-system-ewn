@@ -48,7 +48,7 @@ if(isset($_SESSION['error'])){
             <span class="glyphicon glyphicon-lock form-control-feedback"></span>
           </div>
 		  <div class="form-group mb-5">
-		  	<a href="../answer_username.php">Forgot password?</a>
+		  	<a href="../forgot_password.php">Forgot password?</a>
 		  </div>
       		<div class="row">
     			<div class="col-xs-12">

@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.0
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 02, 2024 at 10:17 AM
--- Server version: 10.4.24-MariaDB
--- PHP Version: 8.1.6
+-- Generation Time: Sep 13, 2025 at 11:19 AM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -44,14 +44,14 @@ CREATE TABLE `admin` (
   `ans_3` text NOT NULL,
   `activation` varchar(10) NOT NULL DEFAULT 'Active',
   `status` int(2) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Dumping data for table `admin`
 --
 
 INSERT INTO `admin` (`id`, `username`, `password`, `firstname`, `lastname`, `photo`, `access_role_1`, `created_on`, `sec_1`, `ans_1`, `sec_2`, `ans_2`, `sec_3`, `ans_3`, `activation`, `status`) VALUES
-(2, 'admin', 'admin123', 'Rona', 'Espeso', '', 3, '2024-04-04', 'secq1a', 'whitey', 'secq1b', 'nenita', 'secq3c', '8', 'Active', 0),
+(2, 'admin', 'admin111', 'Rona', 'Espeso', '', 3, '2024-04-04', 'secq1a', '1', 'secq1b', '2', 'secq1c', '3', 'Active', 0),
 (3, 'staff', 'staff123', 'Pat', 'Patin', '', 2, '2024-05-11', 'secq4a', 'football', 'secq1b', 'nenita', 'secq1c', 'cavite', 'Active', 0),
 (4, 'hr', 'hr123', 'Sarang', 'Hae', '', 2, '2024-05-23', '', '', '', '', '', '', 'Active', 0),
 (5, 'as', 'as', 'as', 'as', '', 2, '2024-05-27', 'secq1a', 'as', 'secq1b', 'as', 'secq1c', 'as', 'Active', 0),
@@ -66,7 +66,7 @@ INSERT INTO `admin` (`id`, `username`, `password`, `firstname`, `lastname`, `pho
 CREATE TABLE `approval` (
   `id` int(11) NOT NULL,
   `status` varchar(10) DEFAULT 'pending'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `approval`
@@ -100,16 +100,17 @@ CREATE TABLE `ass_sched_fin` (
   `time` varchar(20) NOT NULL,
   `day` varchar(20) NOT NULL,
   `pullout_status` varchar(2) NOT NULL DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `ass_sched_fin`
 --
 
 INSERT INTO `ass_sched_fin` (`id`, `ass_employee_id`, `ass_employee_id_sc`, `ass_name`, `ass_position`, `ass_meal_allowance`, `ass_adjustments`, `ass_transpo`, `ass_location`, `ass_schedule`, `computed`, `salary_calculation_status`, `date_created`, `time`, `day`, `pullout_status`) VALUES
-(13, '1', 'VC:2024-001', '', '8', '', '', '', '4', '2024-07-03', 0, 0, '07-02-2024', '08:56', 'Tue', '0'),
-(14, '2', 'VC:2024-002', '', '9', '', '', '', '4', '2024-07-03', 0, 0, '07-02-2024', '08:56', 'Tue', '0'),
-(15, '13', 'VC:2024-006', '', '8', '43', '34', '34', '4', '2024-07-03', 0, 0, '07-02-2024', '08:56', 'Tue', '0');
+(23, '1', 'VC:2024-001', '', '12', '', '', '', '1', '2025-09-08', 0, 0, '09-08-2025', '15:28', 'Mon', '0'),
+(28, '1', 'VC:2024-001', '', '12', '', '', '', '3', '2025-08-19', 0, 0, '09-09-2025', '01:52', 'Tue', '0'),
+(29, '1', 'VC:2024-001', '', '12', '', '', '', '1', '2024-12-31', 0, 0, '09-13-2025', '05:16', 'Sat', '0'),
+(30, '1', 'VC:2024-001', '', '12', '', '', '', '1', '2025-09-13', 0, 0, '09-13-2025', '11:14', 'Sat', '0');
 
 -- --------------------------------------------------------
 
@@ -128,7 +129,24 @@ CREATE TABLE `attendance` (
   `adjustments` varchar(50) NOT NULL,
   `meal_allowance` varchar(50) NOT NULL,
   `transportation` varchar(50) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+--
+-- Dumping data for table `attendance`
+--
+
+INSERT INTO `attendance` (`id`, `employee_id`, `date`, `time_in`, `status`, `time_out`, `num_hr`, `adjustments`, `meal_allowance`, `transportation`) VALUES
+(1, 'VC:2024-001', '2025-07-15', '01:59:00', 0, '00:00:00', 0, '', '', ''),
+(2, 'VC:2024-002', '2025-07-15', '03:22:00', 0, '00:00:00', 0, '', '', ''),
+(3, 'VC:2024-002', '2025-07-20', '07:25:00', 0, '00:00:00', 0, '', '', ''),
+(4, 'VC:2024-006', '2025-08-13', '11:24:00', 0, '00:00:00', 0, '', '', ''),
+(5, 'VC:2024-006', '2025-07-16', '11:29:00', 0, '00:00:00', 0, '', '', ''),
+(6, 'VC:2024-001', '2025-09-08', '03:31:00', 0, '00:00:00', 0, '', '', ''),
+(7, 'VC:2024-001', '2025-08-17', '03:48:00', 0, '00:00:00', 0, '', '', ''),
+(8, 'VC:2024-001', '2025-08-18', '01:50:00', 0, '00:00:00', 0, '', '', ''),
+(9, 'VC:2024-001', '2025-08-19', '01:52:00', 0, '00:00:00', 0, '', '', ''),
+(10, 'VC:2024-001', '2024-12-31', '05:17:00', 0, '00:00:00', 0, '', '', ''),
+(11, 'VC:2024-001', '2025-09-13', '11:15:00', 0, '00:00:00', 0, '', '', '');
 
 -- --------------------------------------------------------
 
@@ -141,7 +159,7 @@ CREATE TABLE `audit_logs` (
   `date_and_time` varchar(100) NOT NULL,
   `user` varchar(100) NOT NULL,
   `description` varchar(100) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `audit_logs`
@@ -559,7 +577,42 @@ INSERT INTO `audit_logs` (`id`, `date_and_time`, `user`, `description`) VALUES
 (409, '2024-07-02 16:00:25', 'admin', 'Wage edited by user: admin. id: 1 Wage: 500'),
 (410, '2024-07-02 16:04:54', 'admin', 'Wage edited by user: admin. id: 1 Wage: 600'),
 (411, '2024-07-02 16:07:17', 'admin', 'Wage edited by user: admin. id: 1 Wage: 600'),
-(412, '2024-07-02 16:07:50', 'admin', 'Wage edited by user: admin. id: 1 Wage: 500');
+(412, '2024-07-02 16:07:50', 'admin', 'Wage edited by user: admin. id: 1 Wage: 500'),
+(413, '2025-07-14 16:47:26', 'admin', 'User logged out: admin'),
+(414, '2025-07-15 20:09:55', 'admin', 'Payroll created by: admin. Cutoff: 1. Date range: [2025-07-01] - [2025-07-15]'),
+(415, '2025-07-15 20:34:05', 'admin', 'User logged out: admin'),
+(416, '2025-07-15 20:38:01', 'staff', 'User logged out: staff'),
+(417, '2025-07-15 20:52:33', 'admin', 'Position variable added by: admin. Position: manager. Salary: 833.33'),
+(418, '2025-07-15 20:54:54', 'admin', 'Employee edited by: admin. Name: rg erg. ID: 13'),
+(419, '2025-07-15 20:55:05', 'admin', 'Employee edited by: admin. Name: rg erg. ID: 13'),
+(420, '2025-07-15 20:55:24', 'admin', 'Employee edited by: admin. Name: Jhen Bacho. ID: 1'),
+(421, '2025-07-15 20:55:55', 'admin', 'Payroll created by: admin. Cutoff: 1. Date range: [2025-07-01] - [2025-07-15]'),
+(422, '2025-07-15 21:08:07', 'admin', 'User logged out: admin'),
+(423, '2025-07-15 21:28:45', 'admin', 'Payroll created by: admin. Cutoff: 1. Date range: [2025-07-01] - [2025-07-15]'),
+(424, '2025-07-17 17:50:55', 'admin', 'Deduction edited by user: admin. Description: PhilHealth. employeer: 0.025. employee: 0.025.'),
+(425, '2025-07-20 13:26:09', 'admin', 'Payroll created by: admin. Cutoff: 1. Date range: [2025-07-01] - [2025-07-15]'),
+(426, '2025-08-13 17:29:55', 'admin', 'Payroll created by: admin. Cutoff: 2. Date range: [2025-07-16] - [2025-07-31]'),
+(427, '2025-09-03 14:33:22', 'Rona Espeso', 'SSS contribution schedule updated by: Rona Espeso. ID: 2'),
+(428, '2025-09-03 14:33:41', 'Rona Espeso', 'SSS contribution schedule updated by: Rona Espeso. ID: 2'),
+(429, '2025-09-03 14:33:47', 'Rona Espeso', 'SSS contribution schedule updated by: Rona Espeso. ID: 2'),
+(430, '2025-09-05 14:29:18', 'admin', 'User logged out: admin'),
+(431, '2025-09-08 21:34:17', 'admin', 'Payroll created by: admin. Cutoff: 1. Date range: [2025-09-01] - [2025-09-15]'),
+(432, '2025-09-08 21:49:24', 'admin', 'Payroll created by: admin. Cutoff: 1. Date range: [2025-08-01] - [2025-08-15]'),
+(433, '2025-09-08 21:49:50', 'admin', 'Payroll created by: admin. Cutoff: 2. Date range: [2025-08-16] - [2025-08-31]'),
+(434, '2025-09-09 07:51:00', 'admin', 'Payroll created by: admin. Cutoff: 2. Date range: [2025-08-16] - [2025-08-31]'),
+(435, '2025-09-09 07:53:28', 'admin', 'Payroll created by: admin. Cutoff: 2. Date range: [2025-08-16] - [2025-08-31]'),
+(436, '2025-09-12 23:48:10', 'admin', 'User logged out: admin'),
+(437, '2025-09-12 23:59:58', 'admin', 'Payroll created by: admin. Cutoff: 1. Date range: [2025-09-01] - [2025-09-15]'),
+(438, '2025-09-13 00:00:05', 'admin', 'Payroll created by: admin. Cutoff: 2. Date range: [2025-08-16] - [2025-08-31]'),
+(439, '2025-09-13 11:17:32', 'admin', 'User logged out: admin'),
+(440, '2025-09-13 11:18:05', 'admin', 'Payroll created by: admin. Cutoff: 2. Date range: [2024-12-16] - [2024-12-31]'),
+(441, '2025-09-13 15:55:44', 'admin', 'User logged out: admin'),
+(442, '2025-09-13 17:02:25', 'admin', 'User logged out: admin'),
+(443, '2025-09-13 17:09:26', 'Rona Espeso', 'SSS contribution schedule updated by: Rona Espeso. ID: 1'),
+(444, '2025-09-13 17:09:59', 'Rona Espeso', 'SSS contribution schedule updated by: Rona Espeso. ID: 1'),
+(445, '2025-09-13 17:13:05', 'admin', 'User logged out: admin'),
+(446, '2025-09-13 17:15:11', 'admin', 'Payroll created by: admin. Cutoff: 1. Date range: [2025-09-01] - [2025-09-15]'),
+(447, '2025-09-13 17:17:53', 'admin', 'User logged out: admin');
 
 -- --------------------------------------------------------
 
@@ -571,7 +624,7 @@ CREATE TABLE `base_pay` (
   `id` int(11) NOT NULL,
   `base_pay` varchar(11) NOT NULL,
   `active` varchar(5) NOT NULL DEFAULT 'no'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `base_pay`
@@ -598,7 +651,27 @@ CREATE TABLE `cashadvance` (
   `empid` varchar(11) NOT NULL,
   `employee_id` varchar(11) NOT NULL,
   `date_advance` varchar(100) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `cashadvance`
+--
+
+INSERT INTO `cashadvance` (`id`, `amount`, `pay_per_cut_off`, `number_of_cutoffs`, `balance`, `empid`, `employee_id`, `date_advance`) VALUES
+(1, '500', '500', '1', '500', '', 'VC:2024-001', '2025-07-15'),
+(2, '500', '500', '', '500', '', 'VC:2024-001', '2025-07-15'),
+(3, '501', '500', '', '500', '', 'VC:2024-001', '2025-07-15'),
+(4, '501', '500', '', '500', '', 'VC:2024-001', '2025-07-15'),
+(5, '501/', '500', '', '500', '', 'VC:2024-001', '2025-07-15'),
+(6, '500', '500', '', '500', '', 'VC:2024-001', '2025-07-15'),
+(7, '500', '500', '0', '0', '', 'VC:2024-001', '2025-07-15'),
+(8, '500', '500', '', '0', '', 'VC:2024-001', '2025-07-17'),
+(9, '500', '500', '', '0', '', 'VC:2024-001', '2025-09-09'),
+(10, '0', '0', '', '0', '', 'VC:2024-001', '2025-09-09'),
+(11, '500', '0', '', '0', '', 'VC:2024-001', '2025-09-13'),
+(12, '500', '500', '', '500', '', 'VC:2024-001', '2025-09-13'),
+(13, '1000', '1000', '1', '1000', '', 'VC:2024-001', '2025-09-13'),
+(14, '1000', '1000', '0', '0', '', 'VC:2024-001', '2025-09-13');
 
 -- --------------------------------------------------------
 
@@ -613,7 +686,7 @@ CREATE TABLE `cashadvance_history` (
   `paid` varchar(100) NOT NULL,
   `balance` varchar(100) NOT NULL,
   `date` varchar(100) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -626,7 +699,7 @@ CREATE TABLE `deductions` (
   `description` varchar(100) NOT NULL,
   `employeer_contribution` varchar(20) NOT NULL,
   `employee_contribution` varchar(20) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Dumping data for table `deductions`
@@ -635,7 +708,7 @@ CREATE TABLE `deductions` (
 INSERT INTO `deductions` (`id`, `description`, `employeer_contribution`, `employee_contribution`) VALUES
 (1, 'SSS', '0.095', '0.045'),
 (2, 'Pagibig', '200', '200'),
-(3, 'PhilHealth', '0.025', '.025');
+(3, 'PhilHealth', '0.025', '0.025');
 
 -- --------------------------------------------------------
 
@@ -678,19 +751,19 @@ CREATE TABLE `employees` (
   `archive` varchar(20) NOT NULL DEFAULT 'no',
   `assigned_status` varchar(2) NOT NULL DEFAULT '0',
   `reg_rel_id` int(11) NOT NULL DEFAULT 1
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Dumping data for table `employees`
 --
 
 INSERT INTO `employees` (`id`, `employee_id`, `firstname`, `lastname`, `nickname`, `address`, `birthdate`, `bloodtype`, `contact_info`, `gender`, `position_id`, `photo`, `created_on`, `email`, `fb`, `civil_status`, `sss`, `sss_deduction`, `tin_deduction`, `philhealth_deduction`, `pagibig_deduction`, `tin`, `pagibig`, `philhealth`, `contact_person`, `contact_person_address`, `contact_person_number`, `bank_name`, `bank_services`, `bank_account`, `gcash`, `archive`, `assigned_status`, `reg_rel_id`) VALUES
-(1, 'VC:2024-001', 'Jhen', 'Bacho', 'Wes', 'USA', '2024-04-19', 'AB+', '09648569565', 'Male', 8, 'profile.jpg', '2024-04-20', 'wesley@gmail.com', 'wesley_wes', 'Single', '9875485748458', '1', '', '3', '2', '', '', '659856526365', 'Fabiano Caruana', 'USA', '09864587586', 'UnionBank', 'Savings', '369875468523', '09658425625', 'no', '0', 2),
+(1, 'VC:2024-001', 'Jhen', 'Bacho', 'Wes', 'USA', '2024-04-19', 'AB+', '09648569565', 'Male', 12, 'profile.jpg', '2024-04-20', 'wesley@gmail.com', 'wesley_wes', 'Single', '9875485748458', '1', '', '3', '2', '', '', '659856526365', 'Fabiano Caruana', 'USA', '09864587586', 'UnionBank', 'Savings', '369875468523', '09658425625', 'no', '0', 1),
 (2, 'VC:2024-002', 'Genielyn', 'Gonzales', 'Genielyn', 'Russia', '2024-04-10', 'AB+', '09658462535', 'Male', 9, 'profile.jpg', '2024-04-20', 'garry@gmail.com', 'garry', 'Married', '6859756845111', '1', '', '3', '2', '546875486111', '365245857111', '655874512111', 'Hansmoke Niemann', 'Ambot', '09874565854', 'Maybank Philippines', 'Checking', '987546213584', '09854875154', 'no', '0', 2),
 (10, 'VC:2024-003', 'Juan', 'Delacruz', 'juan', 'Kawit', '1999-06-16', 'B+', '03695855566', 'Male', 9, 'profile.jpg', '2024-05-26', 'juan@gmail.com', 'juan', 'Married', '', '', '', '', '', '', '', '', 'Alice', 'Cavite City', '09856558545', 'RCBC', 'Savings', '326566565999', '06598889956', 'yes', '0', 0),
 (11, 'VC:2024-004', 'Pedro', 'Penduko', 'Pedro', 'Tejero', '1999-06-16', 'B', '09656565626', 'Female', 8, 'profile.jpg', '2024-05-26', 'pedro@gmail.com', 'peterpan', 'Married', '', '', '', '', '', '', '', '', 'Paul ', 'Kawit', '09865656566', 'China Bank', 'Checking', '656565659965', '09865656266', 'yes', '0', 0),
 (12, 'VC:2024-005', 'erge', 'erg', 'erg', 'ergerg', '2024-05-22', 'B', '45345454545', 'Male', 8, '', '2024-05-27', 'dfg@gmail.com', 'ergerg', 'Single', '', '', '', '', '', '', '', '', '456456456', 'hrthrthrth', '54665465644', 'RCBC', 'Checking', '456456456666', '54645654666', 'yes', '0', 2),
-(13, 'VC:2024-006', 'rg', 'erg', 'erg', 'egferwg', '2024-06-14', 'A+', '45454555555', 'Male', 8, 'top-10-the-most-beautiful-japanese-actresses.jpg', '2024-06-24', 'er@gmail.com', 'reg', 'Single', '4565656546', '1', '', '3', '2', '411111111111', '111111111111', '111111111111', 'rdfgjgj', 'tyjrj', '56456453454', 'RCBC', 'Savings', '453454545455', '43534545447', 'no', '0', 2);
+(13, 'VC:2024-006', 'rg', 'erg', 'erg', 'egferwg', '2024-06-14', 'A+', '45454555555', 'Male', 12, 'top-10-the-most-beautiful-japanese-actresses.jpg', '2024-06-24', 'er@gmail.com', 'reg', 'Single', '4565656546', '1', '', '3', '2', '411111111111', '111111111111', '111111111111', 'rdfgjgj', 'tyjrj', '56456453454', 'RCBC', 'Savings', '453454545455', '43534545447', 'no', '0', 2);
 
 -- --------------------------------------------------------
 
@@ -724,7 +797,24 @@ CREATE TABLE `employee_financial_list` (
   `location_id` varchar(50) NOT NULL,
   `ass_sched_fin_date` varchar(20) NOT NULL,
   `status` int(2) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `employee_financial_list`
+--
+
+INSERT INTO `employee_financial_list` (`id`, `reimbursement_proof`, `employee_id`, `date`, `base_pay`, `salary`, `leave_credits`, `meal_allowance`, `meal_allowance_additional`, `incentives_value`, `adjustments`, `adjustments_additional`, `transportation`, `transportation_additional`, `sss_employeer`, `sss_emp`, `philhealth_employeer`, `philhealth_emp`, `pagibig_employeer`, `pagibig_emp`, `tin_employeer`, `tin_emp`, `location_id`, `ass_sched_fin_date`, `status`) VALUES
+(1, '', 'VC:2024-001', '2025-07-15', '7500', '625', '5', '0', '', '600.02', '0', '', '0', '', '0.095', '0.045', '0.025', '.025', '200', '200', '', '', '1', '07-15-2025', 0),
+(2, '', 'VC:2024-002', '2025-07-15', '8500', '708.33', '5', '0', '', '684.68', '0', '', '0', '', '0.095', '0.045', '0.025', '.025', '200', '200', '', '', '2', '07-15-2025', 0),
+(3, '', 'VC:2024-002', '2025-07-20', '8500', '708.33', '5', '0', '', '197.94', '0', '', '0', '', '0.095', '0.045', '0.025', '0.025', '200', '200', '', '', '5', '07-20-2025', 0),
+(4, '', 'VC:2024-006', '2025-08-13', '10000', '833.33', '5', '0', '', '600.02', '0', '', '0', '', '0.095', '0.045', '0.025', '0.025', '200', '200', '', '', '1', '08-13-2025', 0),
+(5, '', 'VC:2024-006', '2025-07-16', '10000', '833.33', '5', '0', '', '600.02', '0', '', '0', '', '0.095', '0.045', '0.025', '0.025', '200', '200', '', '', '1', '08-13-2025', 0),
+(6, '', 'VC:2024-001', '2025-09-08', '10000', '833.33', '5', '0', '', '600.02', '0', '', '0', '', '0.095', '0.045', '0.025', '0.025', '200', '200', '', '', '1', '09-08-2025', 0),
+(7, '', 'VC:2024-001', '2025-08-17', '10000', '833.33', '5', '0', '', '600.02', '0', '', '0', '', '0.095', '0.045', '0.025', '0.025', '200', '200', '', '', '1', '09-08-2025', 0),
+(8, '', 'VC:2024-001', '2025-08-18', '10000', '833.33', '5', '0', '', '684.68', '0', '', '0', '', '0.095', '0.045', '0.025', '0.025', '200', '200', '', '', '2', '09-09-2025', 0),
+(9, '', 'VC:2024-001', '2025-08-19', '10000', '833.33', '5', '0', '', '630', '0', '', '0', '', '0.095', '0.045', '0.025', '0.025', '200', '200', '', '', '3', '09-09-2025', 0),
+(10, '', 'VC:2024-001', '2024-12-31', '10000', '833.33', '5', '0', '', '600.02', '0', '', '0', '', '0.095', '0.045', '0.025', '0.025', '200', '200', '', '', '1', '09-13-2025', 0),
+(11, '', 'VC:2024-001', '2025-09-13', '10000', '833.33', '5', '0', '', '600.02', '0', '', '0', '', '0.095', '0.045', '0.025', '0.025', '200', '200', '', '', '1', '09-13-2025', 0);
 
 -- --------------------------------------------------------
 
@@ -742,7 +832,7 @@ CREATE TABLE `income_tax` (
   `tax-rate` varchar(11) NOT NULL,
   `income-tax` varchar(11) NOT NULL,
   `calculation_date` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `income_tax`
@@ -771,21 +861,21 @@ CREATE TABLE `location` (
   `status` int(1) NOT NULL DEFAULT 0,
   `location_archive` varchar(3) NOT NULL DEFAULT 'no',
   `date` varchar(50) NOT NULL DEFAULT '2024-04-19'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `location`
 --
 
 INSERT INTO `location` (`id`, `province`, `municipality`, `incentives`, `doc`, `status`, `location_archive`, `date`) VALUES
-(1, 'Cavite', 'Kawit', '.02', '30000', 1, 'no', '2024-07-02'),
-(2, 'Indang', 'Cavite', '.02', '34234', 1, 'no', '2024-07-02'),
-(3, 'Cavite', 'Wealth core', '.03', '21000', 1, 'no', '2024-07-02'),
-(4, 'Manila', 'Bulacan', '.02', '23423', 1, 'no', '2024-07-02'),
-(5, 'Cavite', 'Danson', '.02', '9897', 1, 'no', '2024-07-02'),
-(6, 'Antipolo', 'Rizal', '.02', '32000', 1, 'no', '2024-07-02'),
-(7, 'Cabiao', 'Laguna', '.02', '31123', 1, 'no', '2024-07-02'),
-(48, 'Cagayan', 'Aparri', '345', '345', 1, 'yes', '2024-07-02');
+(1, 'Cavite', 'Kawit', '.02', '30001', 1, 'no', '2025-07-15'),
+(2, 'Indang', 'Cavite', '.02', '34234', 1, 'no', '2025-07-15'),
+(3, 'Cavite', 'Wealth core', '.03', '21000', 1, 'no', '2025-07-15'),
+(4, 'Manila', 'Bulacan', '.02', '23423', 1, 'no', '2025-07-15'),
+(5, 'Cavite', 'Danson', '.02', '9897', 1, 'no', '2025-07-15'),
+(6, 'Antipolo', 'Rizal', '.02', '32000', 1, 'no', '2025-07-15'),
+(7, 'Cabiao', 'Laguna', '.02', '31123', 1, 'no', '2025-07-15'),
+(48, 'Cagayan', 'Aparri', '345', '345', 1, 'yes', '2025-07-15');
 
 -- --------------------------------------------------------
 
@@ -826,7 +916,14 @@ CREATE TABLE `payroll_employee` (
   `remaining_credits` varchar(11) NOT NULL,
   `created_on` varchar(50) NOT NULL,
   `status` int(1) NOT NULL DEFAULT 1
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `payroll_employee`
+--
+
+INSERT INTO `payroll_employee` (`id`, `payroll_number`, `employee_id`, `date_range`, `salary`, `meal_allowance`, `incentives`, `adjustments`, `transportation`, `sss`, `sss_employeer`, `pagibig`, `pagibig_employeer`, `tin`, `tin_employeer`, `philhealth`, `philhealth_employeer`, `cashadvance`, `pay_per_cut_off`, `cashadvance_balance`, `total_deduction`, `_13th`, `bonus`, `gross`, `net_salary`, `net_salary_after`, `num_days_work`, `workdays_total`, `num_of_absent`, `remaining_credits`, `created_on`, `status`) VALUES
+(17, '', 'VC:2024-001', '[2025-09-01] - [2025-09-15]', '1666.66', '0', '1200.04', '0', '0', '0', '1010', '200', '200', '0', '0', '0', '250', '1000', '1000', '0', '1200', '0', '0', '2866.7', '1666.7', '0', '2', '2', '0', '5', '2025-09-13', 1);
 
 -- --------------------------------------------------------
 
@@ -843,7 +940,7 @@ CREATE TABLE `payroll_summary` (
   `net_salary` varchar(15) NOT NULL,
   `created_on` varchar(100) NOT NULL,
   `status_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -857,7 +954,7 @@ CREATE TABLE `position` (
   `base_pay` varchar(11) NOT NULL,
   `leave_credits` varchar(11) NOT NULL,
   `rate` double NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Dumping data for table `position`
@@ -865,7 +962,8 @@ CREATE TABLE `position` (
 
 INSERT INTO `position` (`id`, `description`, `base_pay`, `leave_credits`, `rate`) VALUES
 (8, 'Technician', '7500', '5', 625),
-(9, 'vaccinator', '8500', '5', 708.33);
+(9, 'vaccinator', '8500', '5', 708.33),
+(12, 'manager', '10000', '5', 833.33);
 
 -- --------------------------------------------------------
 
@@ -876,7 +974,7 @@ INSERT INTO `position` (`id`, `description`, `base_pay`, `leave_credits`, `rate`
 CREATE TABLE `reg_rel` (
   `id` int(11) NOT NULL,
   `title` varchar(100) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `reg_rel`
@@ -904,7 +1002,7 @@ CREATE TABLE `salary_calculation` (
   `total_cost` varchar(20) NOT NULL,
   `location_id` int(11) NOT NULL,
   `salary_calculation_status` int(11) NOT NULL DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -925,7 +1023,7 @@ CREATE TABLE `salary_computed` (
   `com_crew` varchar(20) NOT NULL,
   `com_total_cost` varchar(20) NOT NULL,
   `location_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -939,7 +1037,7 @@ CREATE TABLE `schedules` (
   `time_out` time NOT NULL,
   `day` varchar(20) NOT NULL,
   `day_value` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Dumping data for table `schedules`
@@ -956,6 +1054,116 @@ INSERT INTO `schedules` (`id`, `time_in`, `time_out`, `day`, `day_value`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `sss_contribution_schedule`
+--
+
+CREATE TABLE `sss_contribution_schedule` (
+  `id` int(11) NOT NULL,
+  `min_compensation` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `max_compensation` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `regular_ss_employer` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `mpf_employer` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `ec_employer` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `regular_ss_employee` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `mpf_employee` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `active` enum('yes','no') NOT NULL DEFAULT 'yes',
+  `created_on` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_on` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `sss_contribution_schedule`
+--
+
+INSERT INTO `sss_contribution_schedule` (`id`, `min_compensation`, `max_compensation`, `regular_ss_employer`, `mpf_employer`, `ec_employer`, `regular_ss_employee`, `mpf_employee`, `active`, `created_on`, `updated_on`) VALUES
+(1, 0.00, 5249.99, 500.00, 0.00, 10.00, 250.00, 0.00, 'yes', '2025-09-03 06:09:57', '2025-09-13 09:09:59'),
+(2, 5250.00, 5749.99, 550.00, 0.00, 10.00, 275.00, 0.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:33:47'),
+(3, 5750.00, 6249.99, 600.00, 0.00, 10.00, 300.00, 0.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(4, 6250.00, 6749.99, 650.00, 0.00, 10.00, 325.00, 0.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(5, 6750.00, 7249.99, 700.00, 0.00, 10.00, 350.00, 0.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(6, 7250.00, 7749.99, 750.00, 0.00, 10.00, 375.00, 0.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(7, 7750.00, 8249.99, 800.00, 0.00, 10.00, 400.00, 0.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(8, 8250.00, 8749.99, 850.00, 0.00, 10.00, 425.00, 0.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(9, 8750.00, 9249.99, 900.00, 0.00, 10.00, 450.00, 0.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(10, 9250.00, 9749.99, 950.00, 0.00, 10.00, 475.00, 0.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(11, 9750.00, 10249.99, 1000.00, 0.00, 10.00, 500.00, 0.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(12, 10250.00, 10749.99, 1050.00, 0.00, 10.00, 525.00, 0.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(13, 10750.00, 11249.99, 1100.00, 0.00, 10.00, 550.00, 0.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(14, 11250.00, 11749.99, 1150.00, 0.00, 10.00, 575.00, 0.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(15, 11750.00, 12249.99, 1200.00, 0.00, 10.00, 600.00, 0.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(16, 12250.00, 12749.99, 1250.00, 0.00, 10.00, 625.00, 0.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(17, 12750.00, 13249.99, 1300.00, 0.00, 10.00, 650.00, 0.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(18, 13250.00, 13749.99, 1350.00, 0.00, 10.00, 675.00, 0.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(19, 13750.00, 14249.99, 1400.00, 0.00, 10.00, 700.00, 0.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(20, 14250.00, 14749.99, 1450.00, 0.00, 10.00, 725.00, 0.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(21, 14750.00, 15249.99, 1500.00, 0.00, 30.00, 750.00, 0.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(22, 15250.00, 15749.99, 1550.00, 0.00, 30.00, 775.00, 0.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(23, 15750.00, 16249.99, 1600.00, 0.00, 30.00, 800.00, 0.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(24, 16250.00, 16749.99, 1650.00, 0.00, 30.00, 825.00, 0.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(25, 16750.00, 17249.99, 1700.00, 0.00, 30.00, 850.00, 0.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(26, 17250.00, 17749.99, 1750.00, 0.00, 30.00, 875.00, 0.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(27, 17750.00, 18249.99, 1800.00, 0.00, 30.00, 900.00, 0.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(28, 18250.00, 18749.99, 1850.00, 0.00, 30.00, 925.00, 0.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(29, 18750.00, 19249.99, 1900.00, 0.00, 30.00, 950.00, 0.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(30, 19250.00, 19749.99, 1950.00, 0.00, 30.00, 975.00, 0.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(31, 19750.00, 20249.99, 2000.00, 0.00, 30.00, 1000.00, 0.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(32, 20250.00, 20749.99, 2000.00, 50.00, 30.00, 1000.00, 25.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(33, 20750.00, 21249.99, 2000.00, 100.00, 30.00, 1000.00, 50.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(34, 21250.00, 21749.99, 2000.00, 150.00, 30.00, 1000.00, 75.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(35, 21750.00, 22249.99, 2000.00, 200.00, 30.00, 1000.00, 100.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(36, 22250.00, 22749.99, 2000.00, 250.00, 30.00, 1000.00, 125.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(37, 22750.00, 23249.99, 2000.00, 300.00, 30.00, 1000.00, 150.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(38, 23250.00, 23749.99, 2000.00, 350.00, 30.00, 1000.00, 175.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(39, 23750.00, 24249.99, 2000.00, 400.00, 30.00, 1000.00, 200.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(40, 24250.00, 24749.99, 2000.00, 450.00, 30.00, 1000.00, 225.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(41, 24750.00, 25249.99, 2000.00, 500.00, 30.00, 1000.00, 250.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(42, 25250.00, 25749.99, 2000.00, 550.00, 30.00, 1000.00, 275.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(43, 25750.00, 26249.99, 2000.00, 600.00, 30.00, 1000.00, 300.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(44, 26250.00, 26749.99, 2000.00, 650.00, 30.00, 1000.00, 325.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(45, 26750.00, 27249.99, 2000.00, 700.00, 30.00, 1000.00, 350.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(46, 27250.00, 27749.99, 2000.00, 750.00, 30.00, 1000.00, 375.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(47, 27750.00, 28249.99, 2000.00, 800.00, 30.00, 1000.00, 400.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(48, 28250.00, 28749.99, 2000.00, 850.00, 30.00, 1000.00, 425.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(49, 28750.00, 29249.99, 2000.00, 900.00, 30.00, 1000.00, 450.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(50, 29250.00, 29749.99, 2000.00, 950.00, 30.00, 1000.00, 475.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(51, 29750.00, 30249.99, 2000.00, 1000.00, 30.00, 1000.00, 500.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(52, 30250.00, 30749.99, 2000.00, 1050.00, 30.00, 1000.00, 525.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(53, 30750.00, 31249.99, 2000.00, 1100.00, 30.00, 1000.00, 550.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(54, 31250.00, 31749.99, 2000.00, 1150.00, 30.00, 1000.00, 575.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(55, 31750.00, 32249.99, 2000.00, 1200.00, 30.00, 1000.00, 600.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(56, 32250.00, 32749.99, 2000.00, 1250.00, 30.00, 1000.00, 625.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(57, 32750.00, 33249.99, 2000.00, 1300.00, 30.00, 1000.00, 650.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(58, 33250.00, 33749.99, 2000.00, 1350.00, 30.00, 1000.00, 675.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(59, 33750.00, 34249.99, 2000.00, 1400.00, 30.00, 1000.00, 700.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(60, 34250.00, 34749.99, 2000.00, 1450.00, 30.00, 1000.00, 725.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57'),
+(61, 34750.00, 999999.99, 2000.00, 1500.00, 30.00, 1000.00, 750.00, 'yes', '2025-09-03 06:09:57', '2025-09-03 06:09:57');
+
+-- --------------------------------------------------------
+
+--
+-- Stand-in structure for view `sss_contribution_view`
+-- (See below for the actual view)
+--
+CREATE TABLE `sss_contribution_view` (
+`id` int(11)
+,`min_compensation` decimal(10,2)
+,`max_compensation` decimal(10,2)
+,`regular_ss_employer` decimal(10,2)
+,`mpf_employer` decimal(10,2)
+,`ec_employer` decimal(10,2)
+,`employer_total` decimal(12,2)
+,`regular_ss_employee` decimal(10,2)
+,`mpf_employee` decimal(10,2)
+,`employee_total` decimal(11,2)
+,`grand_total` decimal(14,2)
+,`active` enum('yes','no')
+,`created_on` timestamp
+,`updated_on` timestamp
+);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `staff`
 --
 
@@ -968,7 +1176,7 @@ CREATE TABLE `staff` (
   `access_role_id` int(11) NOT NULL,
   `photo` varchar(255) NOT NULL,
   `created_on` varchar(50) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `staff`
@@ -986,7 +1194,7 @@ INSERT INTO `staff` (`id`, `firstname`, `lastname`, `username`, `password`, `acc
 CREATE TABLE `system_lock` (
   `id` int(11) NOT NULL,
   `status` varchar(5) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `system_lock`
@@ -1010,7 +1218,7 @@ CREATE TABLE `user` (
   `ans_2` varchar(100) NOT NULL,
   `sec_3` varchar(100) NOT NULL,
   `ans_3` varchar(100) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `user`
@@ -1030,7 +1238,7 @@ INSERT INTO `user` (`id`, `access_role`, `sec_1`, `ans_1`, `sec_2`, `ans_2`, `se
 CREATE TABLE `wage` (
   `id` int(11) NOT NULL,
   `current_wage` varchar(255) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `wage`
@@ -1051,7 +1259,7 @@ CREATE TABLE `_13th_pay` (
   `employee_id` varchar(20) NOT NULL,
   `net_salary` varchar(20) NOT NULL,
   `date` varchar(20) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `_13th_pay`
@@ -1070,7 +1278,7 @@ INSERT INTO `_13th_pay` (`id`, `date_range`, `employee_id`, `net_salary`, `date`
 CREATE TABLE `_session` (
   `id` int(11) NOT NULL,
   `sesh` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `_session`
@@ -1078,6 +1286,15 @@ CREATE TABLE `_session` (
 
 INSERT INTO `_session` (`id`, `sesh`) VALUES
 (1, 3600);
+
+-- --------------------------------------------------------
+
+--
+-- Structure for view `sss_contribution_view`
+--
+DROP TABLE IF EXISTS `sss_contribution_view`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `sss_contribution_view`  AS SELECT `sss_contribution_schedule`.`id` AS `id`, `sss_contribution_schedule`.`min_compensation` AS `min_compensation`, `sss_contribution_schedule`.`max_compensation` AS `max_compensation`, `sss_contribution_schedule`.`regular_ss_employer` AS `regular_ss_employer`, `sss_contribution_schedule`.`mpf_employer` AS `mpf_employer`, `sss_contribution_schedule`.`ec_employer` AS `ec_employer`, `sss_contribution_schedule`.`regular_ss_employer`+ `sss_contribution_schedule`.`mpf_employer` + `sss_contribution_schedule`.`ec_employer` AS `employer_total`, `sss_contribution_schedule`.`regular_ss_employee` AS `regular_ss_employee`, `sss_contribution_schedule`.`mpf_employee` AS `mpf_employee`, `sss_contribution_schedule`.`regular_ss_employee`+ `sss_contribution_schedule`.`mpf_employee` AS `employee_total`, `sss_contribution_schedule`.`regular_ss_employer`+ `sss_contribution_schedule`.`mpf_employer` + `sss_contribution_schedule`.`ec_employer` + `sss_contribution_schedule`.`regular_ss_employee` + `sss_contribution_schedule`.`mpf_employee` AS `grand_total`, `sss_contribution_schedule`.`active` AS `active`, `sss_contribution_schedule`.`created_on` AS `created_on`, `sss_contribution_schedule`.`updated_on` AS `updated_on` FROM `sss_contribution_schedule` WHERE `sss_contribution_schedule`.`active` = 'yes' ORDER BY `sss_contribution_schedule`.`min_compensation` ASC ;
 
 --
 -- Indexes for dumped tables
@@ -1204,6 +1421,14 @@ ALTER TABLE `schedules`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `sss_contribution_schedule`
+--
+ALTER TABLE `sss_contribution_schedule`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_compensation_range` (`min_compensation`,`max_compensation`),
+  ADD KEY `idx_active` (`active`);
+
+--
 -- Indexes for table `staff`
 --
 ALTER TABLE `staff`
@@ -1259,19 +1484,19 @@ ALTER TABLE `approval`
 -- AUTO_INCREMENT for table `ass_sched_fin`
 --
 ALTER TABLE `ass_sched_fin`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT for table `attendance`
 --
 ALTER TABLE `attendance`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `audit_logs`
 --
 ALTER TABLE `audit_logs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=413;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=448;
 
 --
 -- AUTO_INCREMENT for table `base_pay`
@@ -1283,7 +1508,7 @@ ALTER TABLE `base_pay`
 -- AUTO_INCREMENT for table `cashadvance`
 --
 ALTER TABLE `cashadvance`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `cashadvance_history`
@@ -1307,7 +1532,7 @@ ALTER TABLE `employees`
 -- AUTO_INCREMENT for table `employee_financial_list`
 --
 ALTER TABLE `employee_financial_list`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `income_tax`
@@ -1325,7 +1550,7 @@ ALTER TABLE `location`
 -- AUTO_INCREMENT for table `payroll_employee`
 --
 ALTER TABLE `payroll_employee`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `payroll_summary`
@@ -1337,7 +1562,7 @@ ALTER TABLE `payroll_summary`
 -- AUTO_INCREMENT for table `position`
 --
 ALTER TABLE `position`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `reg_rel`
@@ -1362,6 +1587,12 @@ ALTER TABLE `salary_computed`
 --
 ALTER TABLE `schedules`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT for table `sss_contribution_schedule`
+--
+ALTER TABLE `sss_contribution_schedule`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=62;
 
 --
 -- AUTO_INCREMENT for table `staff`

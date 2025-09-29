@@ -5,15 +5,14 @@ if(isset($_POST['dateFrom']) && isset($_POST['dateTo'])){
     $dateFrom = $_POST['dateFrom'];
     $dateTo = $_POST['dateTo'];
     
-    // Query to fetch attendance data within the specified date range
+    // Query to fetch cash advance data within the specified date range
     $sql = "SELECT *, CONCAT(firstname,' ',lastname) AS name, 
             cashadvance.id AS caid, 
             employees.employee_id AS empid,
             CAST(amount AS DECIMAL) - CAST(balance AS DECIMAL) AS paid
             FROM cashadvance 
-            LEFT JOIN employees ON employees.id=cashadvance.empid
-            WHERE cashadvance.balance != '0' 
-            AND employees.archive = 'no' 
+            LEFT JOIN employees ON employees.employee_id=cashadvance.employee_id
+            WHERE employees.archive = 'no' 
             AND DATE(cashadvance.date_advance) >= '$dateFrom' 
             AND DATE(cashadvance.date_advance) <= '$dateTo'";
     

@@ -224,17 +224,20 @@ include 'includes/header.php';
             success: function(response) {
                 // Generate printable output using fetched data with EWN logo and styling
                 var printableContent = `
-                <div class="" style="display:flex;align-items:center;justify-content:center;flex-direction:row;text-align:center">
-                <div style="margin-right: 20px;">
-                    <img src="${window.location.origin}/payroll-system-ewn/images/logo.png" class="img-responsive" id="ewn-logo" alt="img"  style="width: 100px">
-                </div>
-                <center><h1><b>EWN Manpower Services</b></h1></center>
-                
-                <b style="margin-left: 20px;">ewn@gmail.com <i class="fa fa-envelope-o"></i><b><br>
-                <b style="margin-left: 20px;">Noveleta, Cavite <i class="fa fa-location-arrow"></i><b>
-                </div>
-                `;
-                printableContent += "<h2>Attendance Report</h2>";
+                <div style="text-align: center; margin-bottom: 30px;">
+                  <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                    <div style="margin-right: 20px;">
+                      <img src="${window.location.origin}/payroll-system-ewn/images/logo.png" class="img-responsive" id="ewn-logo" alt="img" style="width: 100px;">
+                    </div>
+                    <div style="text-align: center;">
+                      <h1 style="margin: 0; font-size: 24px; font-weight: bold;">EWN Manpower Services</h1>
+                      <p style="margin: 10px 0 0 0; font-size: 16px; font-weight: bold;">San Antonio I, Noveleta, Cavite</p>
+                    </div>
+                  </div>
+                  <div style="margin-bottom: 30px;">
+                    <h1 style="margin: 0; font-size: 24px; font-weight: bold;">Attendance Report</h1>
+                  </div>
+                </div>`;
                 printableContent += "<p>Date Range: " + dateFrom + " to " + dateTo + "</p>";
                 printableContent += "<table border=''>";
                 printableContent += "<tr><th>Date</th><th>Employee ID</th><th>Name</th><th>Time In</th></tr>";

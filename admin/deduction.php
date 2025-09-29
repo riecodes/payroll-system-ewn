@@ -63,23 +63,17 @@
                 </thead>
                 <tbody>
                   <?php
-                    $sql = "SELECT * FROM deductions";
+                    $sql = "SELECT * FROM deductions WHERE UPPER(TRIM(description)) != 'SSS'";
                     $query = $conn->query($sql);
                     while($row = $query->fetch_assoc()){
-                      // SSS in Deduction Settings is disabled; SSS is managed via sss_contribution_schedule
-                      $isSSS = strtoupper(trim($row['description'])) === 'SSS';
                   ?>
                         <tr>
                           <td><?php echo $row['id']; ?></td>
-                          <td class='text-right'><?php echo $row['description']; ?><?php echo $isSSS ? " <span class='label label-default' title='Managed via SSS Contribution Schedule'>(disabled)</span>" : ""; ?></td>
+                          <td class='text-right'><?php echo $row['description']; ?></td>
                           <td class='text-left'><?php echo $row['employee_contribution']; ?></td>
                           <td class='text-left'><?php echo $row['employeer_contribution']; ?></td>
                           <td>
-                            <?php if($isSSS){ ?>
-                              <button class='btn btn-default btn-sm btn-flat' disabled title="Disabled - SSS is managed in SSS Contribution Schedule"><i class='fa fa-ban'></i> Disabled</button>
-                            <?php } else { ?>
-                              <button class='btn btn-success btn-sm edit btn-flat' data-id='<?php echo $row['id']; ?>'><i class='fa fa-edit'></i> Edit</button>
-                            <?php } ?>
+                            <button class='btn btn-success btn-sm edit btn-flat' data-id='<?php echo $row['id']; ?>'><i class='fa fa-edit'></i> Edit</button>
                           </td>
                         </tr>
                   <?php
@@ -989,45 +983,51 @@ BELOW 5249.99,500.00,0.00,10.00,250.00,0.00
     var generateButton = document.querySelector('.generate');
     
     generateButton.addEventListener('click', function() {
-      const contribution = document.querySelector("input[name='contribution']:checked").value;
-      let month = document.getElementById('month').value;
-      console.log('Month value from input:', month);
-      
-      // Ensure we have full year-month format
-      if (month && month.length === 2) {
-        // If only month is provided, assume current year
-        const currentYear = new Date().getFullYear();
-        month = currentYear + '-' + month.padStart(2, '0');
-        console.log('Converted month to:', month);
-      }
-      
-      fetchData(contribution, month);
+       const contribution = document.querySelector("input[name='contribution']:checked").value;
+       let month = document.getElementById('month').value;
+       
+       // Ensure we have full year-month format
+       if (month && month.length === 2) {
+         // If only month is provided, assume current year
+         const currentYear = new Date().getFullYear();
+         month = currentYear + '-' + month.padStart(2, '0');
+       }
+       
+       fetchData(contribution, month);
     });
 
     function fetchData(contribution, month) {
-      console.log('Fetching data for:', contribution, month);
       var xhr = new XMLHttpRequest();
       xhr.open('POST', 'deduction_fetch_data.php', true);
       xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
       xhr.onload = function() {
-        console.log('Response status:', xhr.status);
-        console.log('Response text:', xhr.responseText);
         if (xhr.status >= 200 && xhr.status < 300) {
           var response = JSON.parse(xhr.responseText);
-          console.log('Parsed response:', response);
-          var printableContent = `
-            <div style="display:flex;align-items:center;justify-content:center;flex-direction:row;text-align:center">
-              <div style="margin-right: 20px;">
-                <img src="${window.location.origin}/payroll-system-ewn/images/logo.png" class="responsive-img" id="ewn-logo" alt="img" style="width: 100px">
-              </div>
-              <center><h1><b>EWN Manpower Services</b></h1></center>
-              <b style="margin-left: 20px;">ewn@gmail.com <i class="fa fa-envelope-o"></i></b>
-              <b style="margin-left: 20px;">Noveleta, Cavite <i class="fa fa-location-arrow"></i></b>
-            </div>`;
-          printableContent += "<h1>Contribution report</h1>";
-          printableContent += "<p>Contribution: " + contribution + "</p>";
-          printableContent += "<p>Month: " + month + "</p>";
-          printableContent += "<p>Response length: " + response.length + "</p>";
+           // Format contribution type for display
+           var contributionDisplay = contribution.charAt(0).toUpperCase() + contribution.slice(1);
+           if (contribution === 'income tax') {
+             contributionDisplay = 'Income Tax';
+           } else if (contribution === 'sss') {
+             contributionDisplay = 'Social Security System';
+           }
+           
+           var printableContent = `
+             <div style="text-align: center; margin-bottom: 30px;">
+               <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                 <div style="margin-right: 20px;">
+                   <img src="${window.location.origin}/payroll-system-ewn/images/logo.png" class="img-responsive" id="ewn-logo" alt="img" style="width: 100px;">
+                 </div>
+                 <div style="text-align: center;">
+                   <h1 style="margin: 0; font-size: 24px; font-weight: bold;">EWN Manpower Services</h1>
+                   <p style="margin: 10px 0 0 0; font-size: 16px; font-weight: bold;">San Antonio I, Noveleta, Cavite</p>
+                 </div>
+               </div>
+               <div style="margin-bottom: 30px;">
+                 <h1 style="margin: 0; font-size: 24px; font-weight: bold;">${contributionDisplay}</h1>
+                 <p style="margin: 10px 0 0 0; font-size: 16px; font-weight: bold;">Contribution Report</p>
+               </div>
+             </div>`;
+           printableContent += "<p style='text-align: center; margin-bottom: 20px;'><b>Month: " + month + "</b></p>";
           
           if(response.length === 0){
             printableContent += "<p>No payroll data found for the selected month.</p>";

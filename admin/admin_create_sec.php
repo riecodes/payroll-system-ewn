@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $sql = "UPDATE admin SET sec_1 = '$secqa', ans_1='$secAnsA', sec_2='$secqb', ans_2='$secAnsB', sec_3='$secqc', ans_3='$secAnsC' WHERE id = $id";
 
     if ($conn->query($sql) === TRUE) {
-        $_SESSION['success'] = "Security question created successfully".$id;
+        $_SESSION['success'] = "Security question created successfully for user ID: " . $id;
         header("location: admin_create_sec.php");
         exit();
     } else {
